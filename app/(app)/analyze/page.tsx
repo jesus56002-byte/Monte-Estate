@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { PropertySummaryCard } from "@/components/property/PropertySummaryCard";
 import { InvestmentInputsForm } from "@/components/inputs/InvestmentInputsForm";
 import { ResultsSummary } from "@/components/results/ResultsSummary";
+import { MonteCarloPanel } from "@/components/montecarlo/MonteCarloPanel";
 import { deriveDefaultInputs } from "@/lib/utils/defaults";
 import { toInvestmentInputs, type InvestmentInputsFormValues } from "@/lib/validation/investment";
 import { runAnalysis } from "@/lib/finance/analysis";
@@ -58,10 +59,15 @@ function AnalyzeContent() {
     };
   }, [address]);
 
-  const result = useMemo(() => {
+  const investmentInputs = useMemo(() => {
     if (!formValues) return null;
-    return runAnalysis(toInvestmentInputs(formValues));
+    return toInvestmentInputs(formValues);
   }, [formValues]);
+
+  const result = useMemo(() => {
+    if (!investmentInputs) return null;
+    return runAnalysis(investmentInputs);
+  }, [investmentInputs]);
 
   if (!address) {
     return (
@@ -103,9 +109,10 @@ function AnalyzeContent() {
 
       <div className="grid w-full max-w-5xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <InvestmentInputsForm defaultValues={formValues} onChange={setFormValues} />
-        {result && (
-          <div className="flex flex-col items-center gap-4 lg:sticky lg:top-8 lg:self-start">
+        {result && investmentInputs && (
+          <div className="flex flex-col items-center gap-6 lg:sticky lg:top-8 lg:self-start">
             <ResultsSummary result={result} holdingPeriodYears={formValues.holdingPeriodYears} />
+            <MonteCarloPanel baseInputs={investmentInputs} />
           </div>
         )}
       </div>
