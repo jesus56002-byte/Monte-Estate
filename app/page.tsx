@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { publicAccessEnabled } from "@/lib/env";
 
 export default function Home() {
   return (
@@ -11,9 +12,11 @@ export default function Home() {
           <Button asChild variant="ghost" size="sm">
             <Link href="/login">Log in</Link>
           </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/signup">Sign up</Link>
-          </Button>
+          {publicAccessEnabled && (
+            <Button asChild variant="outline" size="sm">
+              <Link href="/signup">Sign up</Link>
+            </Button>
+          )}
           <ThemeToggle />
         </div>
       </header>

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { Check } from "lucide-react";
-import { env, hasStripeConfig } from "@/lib/env";
+import { env, hasStripeConfig, publicAccessEnabled } from "@/lib/env";
 import { getAuthedUser } from "@/lib/supabase/server";
 import { hasActiveAccess, isAdminEmail } from "@/lib/subscription";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -52,7 +52,11 @@ export default async function SubscribePage() {
             ))}
           </ul>
 
-          {hasStripeConfig ? (
+          {!publicAccessEnabled ? (
+            <p className="text-sm text-muted-foreground">
+              Monte Estate isn&apos;t open to new subscribers right now. Check back later.
+            </p>
+          ) : hasStripeConfig ? (
             <SubscribeButton />
           ) : (
             <p className="text-sm text-muted-foreground">

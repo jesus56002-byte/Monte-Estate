@@ -12,6 +12,7 @@ const ALL_KEYS = [
   "STRIPE_WEBHOOK_SECRET",
   "STRIPE_PRICE_ID",
   "ADMIN_EMAILS",
+  "PUBLIC_ACCESS_ENABLED",
   "NEXT_PUBLIC_APP_URL",
 ] as const;
 
@@ -65,5 +66,18 @@ describe("env", () => {
     await expect(
       loadEnvWith({ NEXT_PUBLIC_SUPABASE_URL: "not-a-url" })
     ).rejects.toThrow(/Invalid environment variables/);
+  });
+
+  it("defaults public access to open when PUBLIC_ACCESS_ENABLED is unset", async () => {
+    const { publicAccessEnabled } = await loadEnvWith({});
+    expect(publicAccessEnabled).toBe(true);
+  });
+
+  it("locks public access when PUBLIC_ACCESS_ENABLED is the string \"false\"", async () => {
+    // Regression guard: z.coerce.boolean() would make this true, since
+    // Boolean("false") is true in JS. publicAccessEnabled must compare the
+    // raw string, not coerce it.
+    const { publicAccessEnabled } = await loadEnvWith({ PUBLIC_ACCESS_ENABLED: "false" });
+    expect(publicAccessEnabled).toBe(false);
   });
 });

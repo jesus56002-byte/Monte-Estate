@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { hasSupabaseConfig } from "@/lib/env";
+import { hasSupabaseConfig, publicAccessEnabled } from "@/lib/env";
 import { loginSchema, signupSchema } from "@/lib/validation/auth";
 
 export type AuthActionState = {
@@ -51,6 +51,10 @@ export async function signup(
       ...initialState,
       error: "Supabase is not configured yet. Set the NEXT_PUBLIC_SUPABASE_* env vars.",
     };
+  }
+
+  if (!publicAccessEnabled) {
+    return { ...initialState, error: "Signups are currently closed." };
   }
 
   const parsed = signupSchema.safeParse({

@@ -12,6 +12,10 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
   STRIPE_PRICE_ID: z.string().min(1).optional(),
   ADMIN_EMAILS: z.string().min(1).optional(),
+  // Deliberately a raw string, not z.coerce.boolean() — Boolean("false") is
+  // true in JS, which would make "PUBLIC_ACCESS_ENABLED=false" turn access
+  // back ON. Compared explicitly below instead.
+  PUBLIC_ACCESS_ENABLED: z.string().min(1).optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
 });
 
@@ -35,6 +39,7 @@ const parsed = envSchema.safeParse({
   STRIPE_WEBHOOK_SECRET: emptyToUndefined(process.env.STRIPE_WEBHOOK_SECRET),
   STRIPE_PRICE_ID: emptyToUndefined(process.env.STRIPE_PRICE_ID),
   ADMIN_EMAILS: emptyToUndefined(process.env.ADMIN_EMAILS),
+  PUBLIC_ACCESS_ENABLED: emptyToUndefined(process.env.PUBLIC_ACCESS_ENABLED),
   NEXT_PUBLIC_APP_URL: emptyToUndefined(process.env.NEXT_PUBLIC_APP_URL),
 });
 
@@ -52,3 +57,5 @@ export const hasSupabaseConfig = Boolean(
 export const hasStripeConfig = Boolean(
   env.STRIPE_SECRET_KEY && env.STRIPE_PRICE_ID
 );
+/** Defaults to open; set PUBLIC_ACCESS_ENABLED=false to lock signups/checkout to admins only. */
+export const publicAccessEnabled = env.PUBLIC_ACCESS_ENABLED !== "false";

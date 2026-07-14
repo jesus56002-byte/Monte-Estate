@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { env, hasStripeConfig } from "@/lib/env";
+import { env, hasStripeConfig, publicAccessEnabled } from "@/lib/env";
 import { requireApiUser } from "@/lib/api/requireApiUser";
 import { createClient } from "@/lib/supabase/server";
 import { getStripeClient } from "@/lib/stripe/client";
@@ -11,6 +11,13 @@ export async function POST() {
         error: "STRIPE_NOT_CONFIGURED",
         message: "Billing isn't configured yet. Set STRIPE_SECRET_KEY and STRIPE_PRICE_ID to enable it.",
       },
+      { status: 503 }
+    );
+  }
+
+  if (!publicAccessEnabled) {
+    return NextResponse.json(
+      { error: "SUBSCRIPTIONS_CLOSED", message: "Subscriptions are currently closed." },
       { status: 503 }
     );
   }
