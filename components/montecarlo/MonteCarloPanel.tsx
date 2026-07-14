@@ -1,16 +1,22 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OutcomeHistogram } from "@/components/montecarlo/OutcomeHistogram";
 import { PercentileSummary } from "@/components/montecarlo/PercentileSummary";
 import { buildDefaultSimulationConfig } from "@/lib/montecarlo/engine";
-import { computeHistogram, computePercentileSummary } from "@/lib/montecarlo/stats";
+import { computeHistogram, computePercentileSummary, type PercentileSummary as PercentileSummaryData } from "@/lib/montecarlo/stats";
 import { useMonteCarlo } from "@/lib/montecarlo/useMonteCarlo";
 import type { InvestmentInputs } from "@/lib/finance/types";
 
-export function MonteCarloPanel({ baseInputs }: { baseInputs: InvestmentInputs }) {
+export function MonteCarloPanel({
+  baseInputs,
+  onSummaryChange,
+}: {
+  baseInputs: InvestmentInputs;
+  onSummaryChange?: (summary: { profit: PercentileSummaryData; irr: PercentileSummaryData } | null) => void;
+}) {
   const { status, progress, results, error, run } = useMonteCarlo();
 
   const profitSummary = useMemo(
@@ -22,6 +28,11 @@ export function MonteCarloPanel({ baseInputs }: { baseInputs: InvestmentInputs }
     () => (results ? computeHistogram(results.totalProfit, 44) : []),
     [results]
   );
+
+  useEffect(() => {
+    onSummaryChange?.(profitSummary && irrSummary ? { profit: profitSummary, irr: irrSummary } : null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profitSummary, irrSummary]);
 
   return (
     <Card className="w-full max-w-2xl">

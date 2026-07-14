@@ -6,9 +6,11 @@ import { PropertySummaryCard } from "@/components/property/PropertySummaryCard";
 import { InvestmentInputsForm } from "@/components/inputs/InvestmentInputsForm";
 import { ResultsSummary } from "@/components/results/ResultsSummary";
 import { MonteCarloPanel } from "@/components/montecarlo/MonteCarloPanel";
+import { AIRecommendationCard } from "@/components/ai/AIRecommendationCard";
 import { deriveDefaultInputs } from "@/lib/utils/defaults";
 import { toInvestmentInputs, type InvestmentInputsFormValues } from "@/lib/validation/investment";
 import { runAnalysis } from "@/lib/finance/analysis";
+import type { PercentileSummary } from "@/lib/montecarlo/stats";
 import type { PropertyData } from "@/types/property";
 
 type LookupStatus = "idle" | "loading" | "error" | "success";
@@ -21,6 +23,9 @@ function AnalyzeContent() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [property, setProperty] = useState<PropertyData | null>(null);
   const [formValues, setFormValues] = useState<InvestmentInputsFormValues | null>(null);
+  const [simulationSummary, setSimulationSummary] = useState<
+    { profit: PercentileSummary; irr: PercentileSummary } | null
+  >(null);
 
   useEffect(() => {
     if (!address) return;
@@ -112,7 +117,13 @@ function AnalyzeContent() {
         {result && investmentInputs && (
           <div className="flex flex-col items-center gap-6 lg:sticky lg:top-8 lg:self-start">
             <ResultsSummary result={result} holdingPeriodYears={formValues.holdingPeriodYears} />
-            <MonteCarloPanel baseInputs={investmentInputs} />
+            <MonteCarloPanel baseInputs={investmentInputs} onSummaryChange={setSimulationSummary} />
+            <AIRecommendationCard
+              property={property}
+              investmentInputs={investmentInputs}
+              analysisResult={result}
+              simulationSummary={simulationSummary ?? undefined}
+            />
           </div>
         )}
       </div>
