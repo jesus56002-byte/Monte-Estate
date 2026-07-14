@@ -25,6 +25,7 @@ export function normalizeRentCastData(
     squareFootage: record?.squareFootage ?? null,
     yearBuilt: record?.yearBuilt ?? null,
     lotSize: record?.lotSize ?? null,
+    hoaFeeMonthly: record?.hoa?.fee ?? null,
 
     estimatedValue: value?.price ?? null,
     estimatedValueRangeLow: value?.priceRangeLow ?? null,

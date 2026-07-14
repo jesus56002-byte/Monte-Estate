@@ -15,7 +15,7 @@ export function deriveDefaultInputs(property: PropertyData): InvestmentInputsFor
     monthlyRent,
     propertyTaxAnnual: Math.round(purchasePrice * 0.011),
     insuranceAnnual: Math.round(purchasePrice * 0.0035),
-    hoaMonthly: 0,
+    hoaMonthly: property.hoaFeeMonthly ?? 0,
     maintenancePercent: 5,
     vacancyPercent: 5,
     propertyManagementPercent: 8,

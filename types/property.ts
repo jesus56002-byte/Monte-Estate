@@ -13,6 +13,8 @@ export interface PropertyData {
   squareFootage: number | null;
   yearBuilt: number | null;
   lotSize: number | null;
+  /** Monthly HOA fee, when RentCast has one on file for this property. */
+  hoaFeeMonthly: number | null;
 
   estimatedValue: number | null;
   estimatedValueRangeLow: number | null;

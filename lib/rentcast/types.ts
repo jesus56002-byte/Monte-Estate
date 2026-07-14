@@ -21,6 +21,7 @@ export interface RentCastPropertyRecord {
   squareFootage?: number;
   lotSize?: number;
   yearBuilt?: number;
+  hoa?: { fee?: number };
 }
 
 export interface RentCastValueEstimate {
