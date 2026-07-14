@@ -2,9 +2,7 @@ import { z } from "zod";
 
 export const aiRecommendationSchema = z.object({
   verdict: z.enum(["strong_buy", "buy", "neutral", "caution", "avoid"]),
-  headline: z.string(),
-  reasoning: z.array(z.string()).min(1).max(6),
-  riskFactors: z.array(z.string()).min(1).max(6),
+  interpretation: z.string().max(300),
 });
 
 export type AIRecommendation = z.infer<typeof aiRecommendationSchema>;

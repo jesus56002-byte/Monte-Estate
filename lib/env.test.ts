@@ -42,7 +42,7 @@ describe("env", () => {
     const { hasAnthropicKey, hasRentCastKey, env } = await loadEnvWith({});
     expect(hasAnthropicKey).toBe(false);
     expect(hasRentCastKey).toBe(false);
-    expect(env.ANTHROPIC_MODEL).toBe("claude-opus-4-8");
+    expect(env.ANTHROPIC_MODEL).toBe("claude-sonnet-5");
   });
 
   it("reports keys as configured once real values are set", async () => {

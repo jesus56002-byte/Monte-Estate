@@ -20,8 +20,8 @@ AI-generated investment recommendation.
   growth, and vacancy, run in a Web Worker so the UI never blocks, shown as a
   worst/median/best case summary plus a histogram with a fitted normal-curve
   overlay.
-- **AI recommendation** — a Claude-generated verdict and reasoning grounded in
-  the actual computed numbers and simulation results.
+- **AI interpretation** — a Claude-generated verdict and a 300-character-max
+  interpretation grounded in the actual computed numbers and simulation results.
 - **Accounts & saved deals** — email/password auth; save an analyzed property
   and revisit or re-tune it later.
 

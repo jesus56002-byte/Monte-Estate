@@ -4,7 +4,7 @@ const envSchema = z.object({
   RENTCAST_API_KEY: z.string().min(1).optional(),
   RENTCAST_MAX_REQUESTS: z.coerce.number().int().positive().default(50),
   ANTHROPIC_API_KEY: z.string().min(1).optional(),
-  ANTHROPIC_MODEL: z.string().min(1).default("claude-opus-4-8"),
+  ANTHROPIC_MODEL: z.string().min(1).default("claude-sonnet-5"),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),

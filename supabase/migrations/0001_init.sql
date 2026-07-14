@@ -49,7 +49,7 @@ create table public.deals (
   -- cached Monte Carlo summary only (percentiles/stats, not the raw trials)
   simulation_summary jsonb,
 
-  -- cached AI recommendation: verdict, headline, reasoning, riskFactors
+  -- cached AI interpretation: verdict, interpretation (<=300 chars)
   ai_recommendation jsonb,
 
   is_archived boolean not null default false,

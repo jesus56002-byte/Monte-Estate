@@ -8,8 +8,10 @@ import { aiRecommendationSchema, type AIRecommendation, type AIRecommendationReq
 const SYSTEM_PROMPT = `You are a real-estate investment analyst. You're given a property, a buyer's
 financing and operating assumptions, the resulting deterministic return metrics, and (when available)
 a Monte Carlo simulation summary. Give a candid, specific verdict grounded in the actual numbers
-provided — reference real figures rather than generic advice. Flag genuine risks; don't just validate
-the deal. Keep reasoning and risk factors terse (one sentence each).`;
+provided — reference real figures rather than generic advice. Don't just validate the deal; call out
+the single biggest risk if there is one. Respond with a verdict and one tight interpretation of at
+most 300 characters (a couple of sentences, no bullet points, no filler) that a reader can absorb in
+a few seconds.`;
 
 function buildUserPrompt(input: AIRecommendationRequest): string {
   const { property, investmentInputs: inputs, analysisResult: result, simulationSummary } = input;
@@ -49,7 +51,7 @@ function buildUserPrompt(input: AIRecommendationRequest): string {
 export async function generateRecommendation(input: AIRecommendationRequest): Promise<AIRecommendation> {
   const response = await anthropic.messages.parse({
     model: env.ANTHROPIC_MODEL,
-    max_tokens: 1024,
+    max_tokens: 400,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: buildUserPrompt(input) }],
     output_config: {

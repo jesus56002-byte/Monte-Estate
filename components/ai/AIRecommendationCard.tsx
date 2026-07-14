@@ -99,18 +99,18 @@ export function AIRecommendationCard({
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-base">AI recommendation</CardTitle>
+        <CardTitle className="text-base">AI interpretation</CardTitle>
         {status !== "success" && (
           <Button size="sm" onClick={handleRequest} disabled={status === "loading"}>
             <Sparkles className="size-4" />
-            {status === "loading" ? "Thinking…" : "Get AI recommendation"}
+            {status === "loading" ? "Thinking…" : "Get AI interpretation"}
           </Button>
         )}
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {status === "idle" && (
           <p className="text-sm text-muted-foreground">
-            Ask Claude for a written verdict on this deal, grounded in the numbers above.
+            Ask Claude for a short, grounded read on this deal based on the numbers above.
           </p>
         )}
 
@@ -130,22 +130,7 @@ export function AIRecommendationCard({
             >
               {VERDICT_LABEL[recommendation.verdict]}
             </span>
-            <p className="font-medium">{recommendation.headline}</p>
-            <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-              {recommendation.reasoning.map((point, i) => (
-                <li key={i}>{point}</li>
-              ))}
-            </ul>
-            {recommendation.riskFactors.length > 0 && (
-              <div className="flex flex-col gap-1 border-t pt-3">
-                <p className="text-xs font-medium text-muted-foreground">Risk factors</p>
-                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                  {recommendation.riskFactors.map((point, i) => (
-                    <li key={i}>{point}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <p className="text-sm text-muted-foreground">{recommendation.interpretation}</p>
           </>
         )}
       </CardContent>
