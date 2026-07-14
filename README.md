@@ -5,6 +5,26 @@ assumptions, and see cash flow, cap rate, cash-on-cash return, IRR, and a
 10,000-run Monte Carlo simulation of best/median/worst case outcomes, plus an
 AI-generated investment recommendation.
 
+## Features
+
+- **Property search** — enter an address, auto-populate beds/baths/sqft/year
+  built/estimated value/estimated rent from RentCast.
+- **Investment inputs** — purchase price, down payment, interest rate, loan
+  term, closing costs, taxes, insurance, HOA, maintenance/vacancy/management
+  %, appreciation, rent growth, holding period, and selling costs, pre-filled
+  from the fetched property and editable live.
+- **Results** — monthly cash flow, cap rate, cash-on-cash return, IRR, and
+  total profit after the selected holding period, recomputed instantly as
+  inputs change.
+- **Monte Carlo simulation** — 10,000 trials randomizing appreciation, rent
+  growth, and vacancy, run in a Web Worker so the UI never blocks, shown as a
+  worst/median/best case summary plus a histogram with a fitted normal-curve
+  overlay.
+- **AI recommendation** — a Claude-generated verdict and reasoning grounded in
+  the actual computed numbers and simulation results.
+- **Accounts & saved deals** — email/password auth; save an analyzed property
+  and revisit or re-tune it later.
+
 ## Stack
 
 - Next.js (App Router) + TypeScript
@@ -48,4 +68,7 @@ See `.env.example`. You'll need:
 ## Database
 
 Supabase schema/migrations live in `supabase/migrations/`. Apply them via the
-Supabase CLI or dashboard SQL editor against your project.
+Supabase CLI or dashboard SQL editor against your project. `types/supabase.ts`
+is hand-written to match the migration — regenerate it with
+`supabase gen types typescript` once a real project exists, and keep it in
+sync with future migrations until then.
