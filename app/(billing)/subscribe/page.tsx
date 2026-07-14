@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { Check } from "lucide-react";
-import { hasStripeConfig } from "@/lib/env";
+import { env, hasStripeConfig } from "@/lib/env";
 import { getAuthedUser } from "@/lib/supabase/server";
-import { hasActiveAccess } from "@/lib/subscription";
+import { hasActiveAccess, isAdminEmail } from "@/lib/subscription";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { SubscribeButton } from "@/components/billing/SubscribeButton";
 
@@ -18,6 +18,10 @@ export default async function SubscribePage() {
   const { supabase, user } = await getAuthedUser();
 
   if (user) {
+    if (isAdminEmail(user.email, env.ADMIN_EMAILS)) {
+      redirect("/search");
+    }
+
     const { data: profile } = await supabase
       .from("profiles")
       .select("subscription_status")

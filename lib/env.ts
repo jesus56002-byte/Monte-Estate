@@ -11,6 +11,7 @@ const envSchema = z.object({
   STRIPE_SECRET_KEY: z.string().min(1).optional(),
   STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
   STRIPE_PRICE_ID: z.string().min(1).optional(),
+  ADMIN_EMAILS: z.string().min(1).optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
 });
 
@@ -33,6 +34,7 @@ const parsed = envSchema.safeParse({
   STRIPE_SECRET_KEY: emptyToUndefined(process.env.STRIPE_SECRET_KEY),
   STRIPE_WEBHOOK_SECRET: emptyToUndefined(process.env.STRIPE_WEBHOOK_SECRET),
   STRIPE_PRICE_ID: emptyToUndefined(process.env.STRIPE_PRICE_ID),
+  ADMIN_EMAILS: emptyToUndefined(process.env.ADMIN_EMAILS),
   NEXT_PUBLIC_APP_URL: emptyToUndefined(process.env.NEXT_PUBLIC_APP_URL),
 });
 

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { hasSupabaseConfig } from "@/lib/env";
+import { env, hasSupabaseConfig } from "@/lib/env";
 import { getAuthedUser } from "@/lib/supabase/server";
-import { hasActiveAccess } from "@/lib/subscription";
+import { hasActiveAccess, isAdminEmail } from "@/lib/subscription";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { logout } from "@/app/(auth)/actions";
@@ -31,13 +31,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     redirect("/login");
   }
 
+  const isAdmin = isAdminEmail(user.email, env.ADMIN_EMAILS);
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("subscription_status")
     .eq("id", user.id)
     .single();
 
-  if (!hasActiveAccess(profile?.subscription_status ?? null)) {
+  if (!isAdmin && !hasActiveAccess(profile?.subscription_status ?? null)) {
     redirect("/subscribe");
   }
 
@@ -57,7 +59,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <ManageBillingButton />
+          {!isAdmin && <ManageBillingButton />}
           <form action={logout}>
             <Button type="submit" variant="ghost" size="sm">
               Log out
