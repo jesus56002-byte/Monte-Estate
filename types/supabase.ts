@@ -37,6 +37,7 @@ export interface Database {
           default_interest_rate_pct?: number;
           default_loan_term_years?: number;
         };
+        Relationships: [];
       };
       deals: {
         Row: {
@@ -90,7 +91,10 @@ export interface Database {
           ai_recommendation?: Json | null;
           is_archived?: boolean;
         };
+        Relationships: [];
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
   };
 }
