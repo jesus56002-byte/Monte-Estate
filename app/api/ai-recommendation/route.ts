@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { hasAnthropicKey, hasSupabaseConfig } from "@/lib/env";
-import { createClient } from "@/lib/supabase/server";
+import { hasAnthropicKey } from "@/lib/env";
+import { requireApiUser } from "@/lib/api/requireApiUser";
 import { aiRecommendationRequestSchema } from "@/lib/validation/ai";
 import { generateRecommendation } from "@/lib/anthropic/recommendation";
 
@@ -16,17 +16,8 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!hasSupabaseConfig) {
-    return NextResponse.json({ error: "UNAUTHORIZED", message: "Sign in to request a recommendation." }, { status: 401 });
-  }
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "UNAUTHORIZED", message: "Sign in to request a recommendation." }, { status: 401 });
-  }
+  const gate = await requireApiUser();
+  if (gate.response) return gate.response;
 
   const body = await request.json().catch(() => null);
   const parsed = aiRecommendationRequestSchema.safeParse(body);

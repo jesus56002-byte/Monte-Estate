@@ -8,10 +8,27 @@ import {
 
 const BASE_URL = "https://api.rentcast.io/v1";
 
+/**
+ * In-memory cap on outbound RentCast calls, for testing against a limited
+ * free-tier quota. Resets on server restart — it's a dev safety net, not a
+ * durable rate limiter. Each property search makes 3 calls (record + value +
+ * rent), so RENTCAST_MAX_REQUESTS=50 (the default) is ~16 searches.
+ */
+let requestCount = 0;
+
 async function rentcastGet<T>(path: string, params: Record<string, string | number | undefined>): Promise<T> {
   if (!env.RENTCAST_API_KEY) {
     throw new RentCastApiError("RentCast API key is not configured.", 503);
   }
+
+  if (requestCount >= env.RENTCAST_MAX_REQUESTS) {
+    throw new RentCastApiError(
+      `RentCast request limit reached (${requestCount}/${env.RENTCAST_MAX_REQUESTS} used since the server started). Raise RENTCAST_MAX_REQUESTS or restart the server to reset the count.`,
+      429
+    );
+  }
+  requestCount++;
+  console.info(`[RentCast] request ${requestCount}/${env.RENTCAST_MAX_REQUESTS}: ${path}`);
 
   const url = new URL(`${BASE_URL}${path}`);
   for (const [key, value] of Object.entries(params)) {

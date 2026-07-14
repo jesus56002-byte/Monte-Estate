@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   RENTCAST_API_KEY: z.string().min(1).optional(),
+  RENTCAST_MAX_REQUESTS: z.coerce.number().int().positive().default(50),
   ANTHROPIC_API_KEY: z.string().min(1).optional(),
   ANTHROPIC_MODEL: z.string().min(1).default("claude-opus-4-8"),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
@@ -12,6 +13,7 @@ const envSchema = z.object({
 
 const parsed = envSchema.safeParse({
   RENTCAST_API_KEY: process.env.RENTCAST_API_KEY,
+  RENTCAST_MAX_REQUESTS: process.env.RENTCAST_MAX_REQUESTS,
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
   ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL,
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

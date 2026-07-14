@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OutcomeHistogram } from "@/components/montecarlo/OutcomeHistogram";
@@ -17,7 +17,7 @@ export function MonteCarloPanel({
   baseInputs: InvestmentInputs;
   onSummaryChange?: (summary: { profit: PercentileSummaryData; irr: PercentileSummaryData } | null) => void;
 }) {
-  const { status, progress, results, error, run } = useMonteCarlo();
+  const { status, progress, results, error, run, reset } = useMonteCarlo();
 
   const profitSummary = useMemo(
     () => (results ? computePercentileSummary(results.totalProfit) : null),
@@ -33,6 +33,19 @@ export function MonteCarloPanel({
     onSummaryChange?.(profitSummary && irrSummary ? { profit: profitSummary, irr: irrSummary } : null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profitSummary, irrSummary]);
+
+  // Any completed (or in-flight) simulation was computed against the previous
+  // baseInputs — once the user edits an assumption, that result no longer
+  // describes this deal, so drop it rather than let it silently go stale.
+  const baseInputsKey = JSON.stringify(baseInputs);
+  const lastKeyRef = useRef(baseInputsKey);
+  useEffect(() => {
+    if (lastKeyRef.current !== baseInputsKey) {
+      lastKeyRef.current = baseInputsKey;
+      if (status !== "idle") reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseInputsKey]);
 
   return (
     <Card className="w-full max-w-2xl">

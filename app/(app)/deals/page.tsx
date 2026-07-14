@@ -1,19 +1,20 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { getAuthedUser } from "@/lib/supabase/server";
 import { mapDealRow } from "@/lib/deals/mapRow";
 import { DealCard } from "@/components/deals/DealCard";
 import { Button } from "@/components/ui/button";
 
 export default async function DealsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthedUser();
+  if (!user) {
+    redirect("/login");
+  }
 
   const { data: rows } = await supabase
     .from("deals")
     .select("*")
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .eq("is_archived", false)
     .order("created_at", { ascending: false });
 

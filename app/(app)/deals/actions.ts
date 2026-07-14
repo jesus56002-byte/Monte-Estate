@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedUser } from "@/lib/supabase/server";
 import type { Json } from "@/types/supabase";
 import type { PropertyData } from "@/types/property";
 import type { AnalysisResult } from "@/lib/finance/types";
@@ -19,10 +19,7 @@ export type SaveDealInput = {
 export type SaveDealState = { error: string | null };
 
 export async function saveDeal(input: SaveDealInput): Promise<SaveDealState> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuthedUser();
   if (!user) {
     return { error: "You must be signed in to save a deal." };
   }
@@ -53,16 +50,26 @@ export async function saveDeal(input: SaveDealInput): Promise<SaveDealState> {
   return { error: null };
 }
 
-export async function deleteDeal(dealId: string): Promise<void> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export type DeleteDealState = { error: string | null };
+
+export async function deleteDeal(dealId: string): Promise<DeleteDealState> {
+  const { supabase, user } = await getAuthedUser();
   if (!user) {
     redirect("/login");
   }
 
-  await supabase.from("deals").delete().eq("id", dealId).eq("user_id", user.id);
+  const { error, count } = await supabase
+    .from("deals")
+    .delete({ count: "exact" })
+    .eq("id", dealId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+  if (!count) {
+    return { error: "That deal doesn't exist or you don't have access to it." };
+  }
 
   revalidatePath("/deals");
   redirect("/deals");

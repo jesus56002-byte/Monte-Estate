@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { hasRentCastKey } from "@/lib/env";
+import { requireApiUser } from "@/lib/api/requireApiUser";
 import { addressSearchSchema } from "@/lib/validation/property";
 import { getPropertyRecord, getRentEstimate, getValueEstimate } from "@/lib/rentcast/client";
 import { RentCastApiError } from "@/lib/rentcast/types";
@@ -15,6 +16,9 @@ export async function POST(request: Request) {
       { status: 503 }
     );
   }
+
+  const gate = await requireApiUser();
+  if (gate.response) return gate.response;
 
   const body = await request.json().catch(() => null);
   const parsed = addressSearchSchema.safeParse(body);

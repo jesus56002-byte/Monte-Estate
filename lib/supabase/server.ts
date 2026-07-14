@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { env } from "@/lib/env";
 import type { Database } from "@/types/supabase";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 
 /**
  * Server Supabase client for use in Server Components, Route Handlers, and
@@ -32,4 +33,23 @@ export async function createClient() {
       },
     }
   );
+}
+
+/**
+ * Creates a server client and resolves the current user in one call, so
+ * every Server Component/Action/Route Handler goes through the same path
+ * instead of each hand-rolling `createClient()` + `auth.getUser()` — the
+ * duplication that let one API route ship without an auth check. Callers
+ * still decide what to do when `user` is null (redirect, 401, etc.), since
+ * that varies by call site.
+ */
+export async function getAuthedUser(): Promise<{
+  supabase: SupabaseClient<Database>;
+  user: User | null;
+}> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return { supabase, user };
 }
