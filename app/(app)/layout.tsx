@@ -60,15 +60,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Link href="/deals" className="text-sm text-muted-foreground hover:text-foreground">
             Saved deals
           </Link>
-          <Link href="/settings" className="text-sm text-muted-foreground hover:text-foreground">
-            Settings
-          </Link>
         </nav>
         <div className="flex items-center gap-3">
           <Link href="/settings" className="text-xs text-muted-foreground hover:text-foreground">
             {isAdmin
               ? "Admin access"
               : `${PLAN_LABELS[plan]} · ${Math.max(0, limit - used)}/${limit} left${bonus > 0 ? ` +${bonus} bonus` : ""}`}
+          </Link>
+          <Link href="/settings" className="text-sm text-muted-foreground hover:text-foreground">
+            Settings
           </Link>
           <ThemeToggle />
           <form action={logout}>
