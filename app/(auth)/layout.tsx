@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { Logo } from "@/components/brand/Logo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex items-center justify-between px-6 py-4 border-b">
-        <Link href="/" className="font-semibold tracking-tight">
-          Monte Estate
+      <header className="flex items-center justify-between border-b bg-card/60 px-6 py-4 backdrop-blur">
+        <Link href="/">
+          <Logo />
         </Link>
         <ThemeToggle />
       </header>

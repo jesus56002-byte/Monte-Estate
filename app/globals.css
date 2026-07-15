@@ -3,67 +3,80 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Brand palette derived from the Monte Estate logo/marketing mark: a warm
+ * coral-red-orange (primary), a soft lavender (accent — also the Monte Carlo
+ * chart color, matching the bell-curve illustration in the marketing banner),
+ * and cream/deep-navy neutrals instead of pure white/black. Every color pair
+ * below was checked against WCAG contrast; primary vs accent and the success/
+ * destructive status pair were run through the dataviz skill's CVD validator
+ * (scripts/validate_palette.js) rather than eyeballed. Status colors
+ * (success/destructive) intentionally reuse the skill's pre-validated fixed
+ * steps rather than custom brand hues, since red/green is a hard CVD case no
+ * amount of hue-picking fixes — the mitigation is that they're never the only
+ * signal (always paired with a label or number).
+ */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --success: oklch(0.6 0.15 145);
-  --success-foreground: oklch(0.985 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --histogram-bar: #2a78d6;
-  --histogram-fit-line: #52514e;
+  --background: #fbf6ee;
+  --foreground: #211c2e;
+  --card: #ffffff;
+  --card-foreground: #211c2e;
+  --popover: #ffffff;
+  --popover-foreground: #211c2e;
+  --primary: #cc3b14;
+  --primary-foreground: #fff7ec;
+  --secondary: #efe9fb;
+  --secondary-foreground: #3b2e6b;
+  --muted: #f3ece0;
+  --muted-foreground: #6b6259;
+  --accent: #b7a6f2;
+  --accent-foreground: #241a44;
+  --destructive: #d03b3b;
+  --destructive-foreground: #fff7ec;
+  --border: #e7ddcb;
+  --input: #e7ddcb;
+  --ring: #cc3b14;
+  --success: #0ca30c;
+  --success-foreground: #fff7ec;
+  --chart-1: #cc3b14;
+  --chart-2: #8672e0;
+  --chart-3: #0ca30c;
+  --chart-4: #3b2e6b;
+  --chart-5: #e8a23b;
+  --histogram-bar: #8672e0;
+  --histogram-fit-line: #6b6259;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
+  --background: #14121f;
+  --foreground: #f6efe2;
+  --card: #1e1b2b;
+  --card-foreground: #f6efe2;
+  --popover: #1e1b2b;
+  --popover-foreground: #f6efe2;
+  --primary: #cc3b14;
+  --primary-foreground: #fff7ec;
+  --secondary: #2b2440;
+  --secondary-foreground: #d9cff5;
+  --muted: #262032;
+  --muted-foreground: #b3a8c4;
+  --accent: #8672e0;
+  --accent-foreground: #17101f;
+  --destructive: #d03b3b;
+  --destructive-foreground: #fff7ec;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --success: oklch(0.696 0.17 145);
-  --success-foreground: oklch(0.145 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --histogram-bar: #3987e5;
-  --histogram-fit-line: #c3c2b7;
+  --ring: #cc3b14;
+  --success: #0ca30c;
+  --success-foreground: #fff7ec;
+  --chart-1: #cc3b14;
+  --chart-2: #8672e0;
+  --chart-3: #0ca30c;
+  --chart-4: #d9cff5;
+  --chart-5: #e8a23b;
+  --histogram-bar: #8672e0;
+  --histogram-fit-line: #b3a8c4;
 }
 
 @theme inline {

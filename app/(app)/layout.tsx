@@ -6,6 +6,7 @@ import { isAdminEmail } from "@/lib/subscription";
 import { PLAN_ANALYSIS_LIMITS, PLAN_LABELS, isPlanId } from "@/lib/plans";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { Logo } from "@/components/brand/Logo";
 import { logout } from "@/app/(auth)/actions";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -49,10 +50,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex items-center justify-between px-6 py-4 border-b">
+      <header className="flex items-center justify-between border-b bg-card/60 px-6 py-4 backdrop-blur">
         <nav className="flex items-center gap-6">
-          <Link href="/search" className="font-semibold tracking-tight">
-            Monte Estate
+          <Link href="/search">
+            <Logo />
           </Link>
           <Link href="/search" className="text-sm text-muted-foreground hover:text-foreground">
             Search
@@ -62,7 +63,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </Link>
         </nav>
         <div className="flex items-center gap-3">
-          <Link href="/settings" className="text-xs text-muted-foreground hover:text-foreground">
+          <Link
+            href="/settings"
+            className="rounded-full bg-accent/20 px-2.5 py-1 text-xs font-medium text-accent-foreground hover:bg-accent/30"
+          >
             {isAdmin
               ? "Admin access"
               : `${PLAN_LABELS[plan]} · ${Math.max(0, limit - used)}/${limit} left${bonus > 0 ? ` +${bonus} bonus` : ""}`}
