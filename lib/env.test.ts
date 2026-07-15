@@ -10,7 +10,9 @@ const ALL_KEYS = [
   "SUPABASE_SERVICE_ROLE_KEY",
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
-  "STRIPE_PRICE_ID",
+  "STRIPE_PRICE_STARTER",
+  "STRIPE_PRICE_INVESTOR",
+  "STRIPE_PRICE_TOPUP",
   "ADMIN_EMAILS",
   "PUBLIC_ACCESS_ENABLED",
   "NEXT_PUBLIC_APP_URL",
@@ -60,6 +62,23 @@ describe("env", () => {
     expect(hasRentCastKey).toBe(true);
     expect(hasAnthropicKey).toBe(true);
     expect(hasSupabaseConfig).toBe(true);
+  });
+
+  it("requires all three Stripe prices before hasStripeConfig is true", async () => {
+    const { hasStripeConfig: withOnlyTwo } = await loadEnvWith({
+      STRIPE_SECRET_KEY: "sk_test",
+      STRIPE_PRICE_STARTER: "price_starter",
+      STRIPE_PRICE_INVESTOR: "price_investor",
+    });
+    expect(withOnlyTwo).toBe(false);
+
+    const { hasStripeConfig: withAllThree } = await loadEnvWith({
+      STRIPE_SECRET_KEY: "sk_test",
+      STRIPE_PRICE_STARTER: "price_starter",
+      STRIPE_PRICE_INVESTOR: "price_investor",
+      STRIPE_PRICE_TOPUP: "price_topup",
+    });
+    expect(withAllThree).toBe(true);
   });
 
   it("still throws for a genuinely malformed value", async () => {

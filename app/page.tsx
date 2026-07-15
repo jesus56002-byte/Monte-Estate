@@ -34,6 +34,12 @@ export default function Home() {
             <Link href="/search">Analyze a property</Link>
           </Button>
         </div>
+        <p className="max-w-md text-xs text-muted-foreground">
+          Educational tool only — not financial, investment, legal, or tax advice.{" "}
+          <Link href="/terms" className="underline underline-offset-4">
+            Terms & Conditions
+          </Link>
+        </p>
       </main>
     </div>
   );

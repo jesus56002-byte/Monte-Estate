@@ -25,6 +25,11 @@ export interface Database {
           stripe_subscription_id: string | null;
           subscription_status: string | null;
           subscription_current_period_end: string | null;
+          plan: string;
+          plan_analyses_used: number;
+          bonus_analyses_remaining: number;
+          terms_accepted_at: string | null;
+          terms_version: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -38,6 +43,11 @@ export interface Database {
           stripe_subscription_id?: string | null;
           subscription_status?: string | null;
           subscription_current_period_end?: string | null;
+          plan?: string;
+          plan_analyses_used?: number;
+          bonus_analyses_remaining?: number;
+          terms_accepted_at?: string | null;
+          terms_version?: string | null;
         };
         Update: {
           display_name?: string | null;
@@ -48,6 +58,11 @@ export interface Database {
           stripe_subscription_id?: string | null;
           subscription_status?: string | null;
           subscription_current_period_end?: string | null;
+          plan?: string;
+          plan_analyses_used?: number;
+          bonus_analyses_remaining?: number;
+          terms_accepted_at?: string | null;
+          terms_version?: string | null;
         };
         Relationships: [];
       };
@@ -107,6 +122,20 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      consume_analysis_credit: {
+        Args: { p_user_id: string };
+        Returns: {
+          allowed: boolean;
+          plan: string | null;
+          plan_analyses_used: number;
+          bonus_analyses_remaining: number;
+        }[];
+      };
+      credit_bonus_analyses: {
+        Args: { p_user_id: string; p_amount: number };
+        Returns: undefined;
+      };
+    };
   };
 }

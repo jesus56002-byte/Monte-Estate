@@ -37,6 +37,26 @@ export function AuthForm({
         />
       </div>
 
+      {!isLogin && (
+        <div className="flex items-start gap-2">
+          <input
+            id="termsAccepted"
+            name="termsAccepted"
+            type="checkbox"
+            required
+            className="mt-0.5 size-4 shrink-0 rounded border-input"
+          />
+          <Label htmlFor="termsAccepted" className="text-sm font-normal leading-snug text-muted-foreground">
+            I have read and agree to the{" "}
+            <Link href="/terms" target="_blank" className="font-medium text-foreground underline underline-offset-4">
+              Terms & Conditions
+            </Link>
+            , including that this tool is for educational purposes only, is not financial advice,
+            and that Monte Carlo results are not a guarantee of any outcome.
+          </Label>
+        </div>
+      )}
+
       {state.error && (
         <p role="alert" className="text-sm text-destructive">
           {state.error}

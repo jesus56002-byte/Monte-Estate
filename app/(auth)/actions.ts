@@ -3,8 +3,10 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { hasSupabaseConfig, publicAccessEnabled } from "@/lib/env";
 import { loginSchema, signupSchema } from "@/lib/validation/auth";
+import { TERMS_VERSION } from "@/lib/terms";
 
 export type AuthActionState = {
   error: string | null;
@@ -57,6 +59,10 @@ export async function signup(
     return { ...initialState, error: "Signups are currently closed." };
   }
 
+  if (formData.get("termsAccepted") !== "on") {
+    return { ...initialState, error: "You must agree to the Terms & Conditions to create an account." };
+  }
+
   const parsed = signupSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -75,6 +81,20 @@ export async function signup(
   });
   if (error) {
     return { ...initialState, error: error.message };
+  }
+
+  // Record acceptance via the admin client (not the just-created session's
+  // client) so this still works if email confirmation is ever re-enabled and
+  // signUp() returns without a session.
+  if (data.user) {
+    const admin = createAdminClient();
+    const { error: termsError } = await admin
+      .from("profiles")
+      .update({ terms_accepted_at: new Date().toISOString(), terms_version: TERMS_VERSION })
+      .eq("id", data.user.id);
+    if (termsError) {
+      console.error("[signup] failed to record terms acceptance:", termsError.message);
+    }
   }
 
   if (!data.session) {

@@ -9,12 +9,19 @@ import { buildDefaultSimulationConfig } from "@/lib/montecarlo/engine";
 import { computeHistogram, computePercentileSummary, type PercentileSummary as PercentileSummaryData } from "@/lib/montecarlo/stats";
 import { useMonteCarlo } from "@/lib/montecarlo/useMonteCarlo";
 import type { InvestmentInputs } from "@/lib/finance/types";
+import type { SimulationSummary } from "@/types/deal";
 
 export function MonteCarloPanel({
   baseInputs,
+  autoRun = false,
+  initialSummary = null,
   onSummaryChange,
 }: {
   baseInputs: InvestmentInputs;
+  /** Kick off the first run automatically instead of waiting for a click — free/instant, so safe to do on every load. */
+  autoRun?: boolean;
+  /** Last-persisted summary for this deal, shown immediately while a fresh run (re)computes in the background. */
+  initialSummary?: SimulationSummary | null;
   onSummaryChange?: (summary: { profit: PercentileSummaryData; irr: PercentileSummaryData } | null) => void;
 }) {
   const { status, progress, results, error, run, reset } = useMonteCarlo();
@@ -47,6 +54,21 @@ export function MonteCarloPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseInputsKey]);
 
+  // Cheap and client-only, so it's safe to run on every mount — this is what
+  // makes the simulation feel "always there" instead of requiring a click
+  // each time the deal is opened.
+  const hasAutoRun = useRef(false);
+  useEffect(() => {
+    if (autoRun && !hasAutoRun.current) {
+      hasAutoRun.current = true;
+      run(baseInputs, buildDefaultSimulationConfig(baseInputs));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const showingFreshResults = status === "done" && profitSummary && irrSummary;
+  const showingPersistedSummary = (status === "idle" || status === "running") && initialSummary && !results;
+
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -56,15 +78,24 @@ export function MonteCarloPanel({
           onClick={() => run(baseInputs, buildDefaultSimulationConfig(baseInputs))}
           disabled={status === "running"}
         >
-          {status === "running" ? "Running…" : "Run 10,000 simulations"}
+          {status === "running" ? "Running…" : "Re-run 10,000 simulations"}
         </Button>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-4">
-        {status === "idle" && (
+        {status === "idle" && !initialSummary && (
           <p className="text-sm text-muted-foreground">
             Randomizes appreciation, rent growth, and vacancy across 10,000 trials to show the
             range of outcomes, not just the single-point estimate above.
           </p>
+        )}
+
+        {showingPersistedSummary && (
+          <>
+            <PercentileSummary profit={initialSummary.profit} irr={initialSummary.irr} />
+            <p className="text-center text-xs text-muted-foreground">
+              {status === "running" ? "Recalculating a fresh simulation…" : "From your last run."}
+            </p>
+          </>
         )}
 
         {status === "running" && (
@@ -89,7 +120,7 @@ export function MonteCarloPanel({
           </p>
         )}
 
-        {status === "done" && profitSummary && irrSummary && (
+        {showingFreshResults && (
           <>
             <PercentileSummary profit={profitSummary} irr={irrSummary} />
             <OutcomeHistogram bins={histogramBins} />

@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { env, hasSupabaseConfig } from "@/lib/env";
 import { getAuthedUser } from "@/lib/supabase/server";
-import { hasActiveAccess, isAdminEmail } from "@/lib/subscription";
+import { isAdminEmail } from "@/lib/subscription";
+import { PLAN_ANALYSIS_LIMITS, PLAN_LABELS, isPlanId } from "@/lib/plans";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { logout } from "@/app/(auth)/actions";
@@ -33,15 +34,19 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const isAdmin = isAdminEmail(user.email, env.ADMIN_EMAILS);
 
+  // Free tier is always allowed in — access isn't gated on a subscription
+  // anymore, just on the per-plan analysis quota, enforced where an analysis
+  // is actually performed (createAnalysis). This header badge is just a
+  // status readout, not an access check.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_status")
+    .select("plan, plan_analyses_used, bonus_analyses_remaining")
     .eq("id", user.id)
     .single();
-
-  if (!isAdmin && !hasActiveAccess(profile?.subscription_status ?? null)) {
-    redirect("/subscribe");
-  }
+  const plan = isPlanId(profile?.plan) ? profile.plan : "free";
+  const used = profile?.plan_analyses_used ?? 0;
+  const bonus = profile?.bonus_analyses_remaining ?? 0;
+  const limit = PLAN_ANALYSIS_LIMITS[plan];
 
   return (
     <div className="flex flex-1 flex-col">
@@ -57,9 +62,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             Saved deals
           </Link>
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {isAdmin ? (
+            <span className="text-xs text-muted-foreground">Admin access</span>
+          ) : (
+            <Link href="/subscribe" className="text-xs text-muted-foreground hover:text-foreground">
+              {PLAN_LABELS[plan]} · {Math.max(0, limit - used)}/{limit} left
+              {bonus > 0 ? ` +${bonus} bonus` : ""}
+            </Link>
+          )}
           <ThemeToggle />
-          {!isAdmin && <ManageBillingButton />}
+          {!isAdmin && plan !== "free" && <ManageBillingButton />}
           <form action={logout}>
             <Button type="submit" variant="ghost" size="sm">
               Log out

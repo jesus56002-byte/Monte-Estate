@@ -33,15 +33,21 @@ export function AIRecommendationCard({
   investmentInputs,
   analysisResult,
   simulationSummary,
+  initialRecommendation = null,
+  onRecommendationChange,
 }: {
   property: PropertyData;
   investmentInputs: InvestmentInputs;
   analysisResult: AnalysisResult;
   simulationSummary?: { profit: PercentileSummary; irr: PercentileSummary };
+  /** Already generated for this deal (at creation time) — shown immediately, no fetch needed. */
+  initialRecommendation?: AIRecommendation | null;
+  /** Called after a successful "Regenerate", so the caller can persist it back onto the deal. */
+  onRecommendationChange?: (recommendation: AIRecommendation) => void;
 }) {
-  const [status, setStatus] = useState<Status>("idle");
+  const [status, setStatus] = useState<Status>(initialRecommendation ? "success" : "idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [recommendation, setRecommendation] = useState<AIRecommendation | null>(null);
+  const [recommendation, setRecommendation] = useState<AIRecommendation | null>(initialRecommendation);
 
   async function handleRequest() {
     setStatus("loading");
@@ -90,6 +96,7 @@ export function AIRecommendationCard({
 
       setRecommendation(body.recommendation);
       setStatus("success");
+      onRecommendationChange?.(body.recommendation);
     } catch {
       setErrorMessage("Couldn't reach the server. Try again.");
       setStatus("error");
@@ -100,12 +107,10 @@ export function AIRecommendationCard({
     <Card className="w-full max-w-2xl">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-base">AI interpretation</CardTitle>
-        {status !== "success" && (
-          <Button size="sm" onClick={handleRequest} disabled={status === "loading"}>
-            <Sparkles className="size-4" />
-            {status === "loading" ? "Thinking…" : "Get AI interpretation"}
-          </Button>
-        )}
+        <Button size="sm" variant={recommendation ? "outline" : "default"} onClick={handleRequest} disabled={status === "loading"}>
+          <Sparkles className="size-4" />
+          {status === "loading" ? "Thinking…" : recommendation ? "Regenerate" : "Get AI interpretation"}
+        </Button>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {status === "idle" && (
@@ -120,7 +125,7 @@ export function AIRecommendationCard({
           </p>
         )}
 
-        {status === "success" && recommendation && (
+        {recommendation && (
           <>
             <span
               className={cn(

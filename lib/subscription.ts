@@ -1,10 +1,3 @@
-/** Stripe subscription statuses that should grant access to the app. */
-const ACTIVE_STATUSES = new Set(["active", "trialing"]);
-
-export function hasActiveAccess(subscriptionStatus: string | null): boolean {
-  return subscriptionStatus !== null && ACTIVE_STATUSES.has(subscriptionStatus);
-}
-
 /**
  * Owner/admin bypass — checked against `ADMIN_EMAILS` (comma-separated),
  * a server-only env var. Deliberately not a database column: any such flag
