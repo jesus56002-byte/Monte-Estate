@@ -7,9 +7,10 @@ import { syncSubscriptionToProfile } from "@/lib/stripe/syncSubscription";
  * Synchronous fallback so access unlocks the moment Checkout completes,
  * instead of waiting on webhook delivery. The webhook (app/api/stripe/webhook)
  * remains the source of truth for renewals/cancellations after this point —
- * this page only handles the very first activation.
+ * this page only handles the very first activation (or a top-up purchase,
+ * which the webhook alone handles since there's no subscription object here).
  */
-export default async function SubscribeSuccessPage({
+export default async function SettingsSuccessPage({
   searchParams,
 }: {
   searchParams: Promise<{ session_id?: string }>;
@@ -17,7 +18,7 @@ export default async function SubscribeSuccessPage({
   const { session_id: sessionId } = await searchParams;
 
   if (!hasStripeConfig || !sessionId) {
-    redirect("/subscribe");
+    redirect("/settings");
   }
 
   const stripe = getStripeClient();
@@ -29,5 +30,5 @@ export default async function SubscribeSuccessPage({
     await syncSubscriptionToProfile(session.subscription);
   }
 
-  redirect("/search");
+  redirect(session.mode === "payment" ? "/settings" : "/search");
 }

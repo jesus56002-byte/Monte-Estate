@@ -48,7 +48,7 @@ export default function SearchPage() {
           </p>
           {errorCode === "QUOTA_EXCEEDED" && (
             <Button asChild size="sm">
-              <Link href="/subscribe">View plans</Link>
+              <Link href="/settings">View plans</Link>
             </Button>
           )}
         </div>

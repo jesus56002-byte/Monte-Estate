@@ -7,6 +7,7 @@ import { PLAN_ANALYSIS_LIMITS, PLAN_LABELS, PLAN_MONTHLY_PRICE_USD, TOPUP_ANALYS
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { SubscribeButton } from "@/components/billing/SubscribeButton";
 import { ManageBillingButton } from "@/components/billing/ManageBillingButton";
+import { CancelSubscriptionButton } from "@/components/billing/CancelSubscriptionButton";
 import { cn } from "@/lib/utils";
 
 const FEATURES = [
@@ -18,7 +19,7 @@ const FEATURES = [
 
 const TIER_ORDER: PlanId[] = ["free", "starter", "investor"];
 
-export default async function SubscribePage() {
+export default async function SettingsPage() {
   const { supabase, user } = await getAuthedUser();
 
   if (!user) {
@@ -31,20 +32,29 @@ export default async function SubscribePage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan, plan_analyses_used, bonus_analyses_remaining, subscription_status")
+    .select(
+      "plan, plan_analyses_used, bonus_analyses_remaining, subscription_status, subscription_current_period_end, cancel_at_period_end"
+    )
     .eq("id", user.id)
     .single();
 
   const currentPlan: PlanId = isPlanId(profile?.plan) ? profile.plan : "free";
   const isSubscribed = profile?.subscription_status === "active" || profile?.subscription_status === "trialing";
   const canBuyTopUp = currentPlan !== "free" && isSubscribed;
+  const periodEndLabel = profile?.subscription_current_period_end
+    ? new Date(profile.subscription_current_period_end).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
 
   const billingUnavailable = !publicAccessEnabled || !hasStripeConfig;
 
   return (
     <main className="flex flex-1 flex-col items-center gap-10 px-6 py-12">
       <div className="flex flex-col items-center gap-1 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Plans</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">
           You&apos;re on <span className="font-medium text-foreground">{PLAN_LABELS[currentPlan]}</span> —{" "}
           {Math.max(0, PLAN_ANALYSIS_LIMITS[currentPlan] - (profile?.plan_analyses_used ?? 0))} of{" "}
@@ -125,9 +135,12 @@ export default async function SubscribePage() {
       )}
 
       {isSubscribed && (
-        <div className="flex flex-col items-center gap-1">
-          <p className="text-sm text-muted-foreground">Cancel or update your payment method:</p>
+        <div className="flex flex-col items-center gap-3">
           <ManageBillingButton />
+          <CancelSubscriptionButton
+            cancelAtPeriodEnd={profile?.cancel_at_period_end ?? false}
+            periodEndLabel={periodEndLabel}
+          />
         </div>
       )}
     </main>

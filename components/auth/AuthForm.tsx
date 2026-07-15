@@ -38,6 +38,27 @@ export function AuthForm({
       </div>
 
       {!isLogin && (
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="confirmPassword">Confirm password</Label>
+          <Input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            required
+          />
+        </div>
+      )}
+
+      {!isLogin && (
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="phone">Cell phone number</Label>
+          <Input id="phone" name="phone" type="tel" autoComplete="tel" required />
+        </div>
+      )}
+
+      {!isLogin && (
         <div className="flex items-start gap-2">
           <input
             id="termsAccepted"

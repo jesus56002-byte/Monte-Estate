@@ -30,6 +30,8 @@ export interface Database {
           bonus_analyses_remaining: number;
           terms_accepted_at: string | null;
           terms_version: string | null;
+          phone: string | null;
+          cancel_at_period_end: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -48,6 +50,8 @@ export interface Database {
           bonus_analyses_remaining?: number;
           terms_accepted_at?: string | null;
           terms_version?: string | null;
+          phone?: string | null;
+          cancel_at_period_end?: boolean;
         };
         Update: {
           display_name?: string | null;
@@ -63,6 +67,8 @@ export interface Database {
           bonus_analyses_remaining?: number;
           terms_accepted_at?: string | null;
           terms_version?: string | null;
+          phone?: string | null;
+          cancel_at_period_end?: boolean;
         };
         Relationships: [];
       };

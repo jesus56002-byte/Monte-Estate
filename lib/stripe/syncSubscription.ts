@@ -55,6 +55,7 @@ export async function syncSubscriptionToProfile(subscription: Stripe.Subscriptio
         ? new Date(currentPeriodEndSeconds * 1000).toISOString()
         : null,
       plan: resolvedPlan,
+      cancel_at_period_end: subscription.cancel_at_period_end,
       ...(planChanged ? { plan_analyses_used: 0 } : {}),
     })
     .eq("id", userId);

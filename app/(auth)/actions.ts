@@ -66,6 +66,8 @@ export async function signup(
   const parsed = signupSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+    phone: formData.get("phone"),
   });
   if (!parsed.success) {
     return { ...initialState, error: parsed.error.issues[0]?.message ?? "Invalid input." };
@@ -83,17 +85,21 @@ export async function signup(
     return { ...initialState, error: error.message };
   }
 
-  // Record acceptance via the admin client (not the just-created session's
-  // client) so this still works if email confirmation is ever re-enabled and
-  // signUp() returns without a session.
+  // Record acceptance + phone via the admin client (not the just-created
+  // session's client) so this still works if email confirmation is ever
+  // re-enabled and signUp() returns without a session.
   if (data.user) {
     const admin = createAdminClient();
-    const { error: termsError } = await admin
+    const { error: profileError } = await admin
       .from("profiles")
-      .update({ terms_accepted_at: new Date().toISOString(), terms_version: TERMS_VERSION })
+      .update({
+        terms_accepted_at: new Date().toISOString(),
+        terms_version: TERMS_VERSION,
+        phone: parsed.data.phone,
+      })
       .eq("id", data.user.id);
-    if (termsError) {
-      console.error("[signup] failed to record terms acceptance:", termsError.message);
+    if (profileError) {
+      console.error("[signup] failed to record terms acceptance/phone:", profileError.message);
     }
   }
 

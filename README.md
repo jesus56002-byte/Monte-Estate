@@ -27,8 +27,9 @@ so they're still there on refresh or when you come back later.
   interpretation, generated once automatically when the analysis is created
   (real API cost, so not re-run on every page view) and saved with the deal.
   A "Regenerate" button re-runs it on demand.
-- **Accounts & saved deals** — email/password auth; every analysis is a saved
-  deal from the moment it's created.
+- **Accounts & saved deals** — email/password auth (password confirmation +
+  cell phone number collected at signup); every analysis is a saved deal from
+  the moment it's created.
 - **Tiered usage plans** — Free (3 lifetime analyses, no payment), Starter
   ($11.99/mo, 20 analyses), Investor ($24.99/mo, 60 analyses); Starter/Investor
   subscribers can buy 10 additional analyses for $4.99. See
@@ -37,6 +38,9 @@ so they're still there on refresh or when you come back later.
   and version recorded on the user's profile. See `app/terms/page.tsx`.
   **This is boilerplate, not legal advice — have an actual lawyer review it
   before relying on it, especially since this app charges real money.**
+- **Settings** (`/settings`) — plan comparison and upgrade, buy-10-more
+  top-up, cancel/reactivate subscription, and payment method management, all
+  in one tab in the app nav.
 
 ## Stack
 
@@ -112,9 +116,14 @@ Stripe config at all. Subscription/usage state is written by two paths:
    `checkout.session.completed` (both subscription mode and the one-time
    top-up payment mode), `customer.subscription.{created,updated,deleted}`,
    and `invoice.paid`.
-2. **`app/(billing)/subscribe/success/page.tsx`** — a synchronous fallback
+2. **`app/(app)/settings/success/page.tsx`** — a synchronous fallback
    for the *first* subscription activation, so access unlocks immediately
    instead of waiting on webhook delivery.
+
+Cancel/reactivate (`app/api/stripe/cancel/route.ts`) is a direct in-app
+action, not just a Billing Portal link — it flips `cancel_at_period_end` on
+the Stripe subscription and re-syncs the profile immediately so the Settings
+page reflects it without waiting on the webhook.
 
 Both paths funnel through `lib/stripe/syncSubscription.ts`, which reads the
 Supabase user ID out of `subscription.metadata.supabase_user_id` (set at

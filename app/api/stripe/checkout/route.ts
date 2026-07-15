@@ -90,8 +90,8 @@ export async function POST(request: Request) {
           client_reference_id: user.id,
           line_items: [{ price: env.STRIPE_PRICE_TOPUP, quantity: 1 }],
           metadata: { item: "topup", supabase_user_id: user.id, topup_analyses: String(TOPUP_ANALYSES) },
-          success_url: `${env.NEXT_PUBLIC_APP_URL}/subscribe/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${env.NEXT_PUBLIC_APP_URL}/subscribe`,
+          success_url: `${env.NEXT_PUBLIC_APP_URL}/settings/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${env.NEXT_PUBLIC_APP_URL}/settings`,
         })
       : await stripe.checkout.sessions.create({
           mode: "subscription",
@@ -99,8 +99,8 @@ export async function POST(request: Request) {
           client_reference_id: user.id,
           line_items: [{ price: SUBSCRIPTION_ITEMS[item], quantity: 1 }],
           subscription_data: { metadata: { supabase_user_id: user.id } },
-          success_url: `${env.NEXT_PUBLIC_APP_URL}/subscribe/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${env.NEXT_PUBLIC_APP_URL}/subscribe`,
+          success_url: `${env.NEXT_PUBLIC_APP_URL}/settings/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${env.NEXT_PUBLIC_APP_URL}/settings`,
         });
 
   if (!session.url) {
