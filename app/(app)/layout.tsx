@@ -60,21 +60,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Link href="/deals" className="text-sm text-muted-foreground hover:text-foreground">
             Saved deals
           </Link>
-          {!isAdmin && (
-            <Link href="/settings" className="text-sm text-muted-foreground hover:text-foreground">
-              Settings
-            </Link>
-          )}
+          <Link href="/settings" className="text-sm text-muted-foreground hover:text-foreground">
+            Settings
+          </Link>
         </nav>
         <div className="flex items-center gap-3">
-          {isAdmin ? (
-            <span className="text-xs text-muted-foreground">Admin access</span>
-          ) : (
-            <Link href="/settings" className="text-xs text-muted-foreground hover:text-foreground">
-              {PLAN_LABELS[plan]} · {Math.max(0, limit - used)}/{limit} left
-              {bonus > 0 ? ` +${bonus} bonus` : ""}
-            </Link>
-          )}
+          <Link href="/settings" className="text-xs text-muted-foreground hover:text-foreground">
+            {isAdmin
+              ? "Admin access"
+              : `${PLAN_LABELS[plan]} · ${Math.max(0, limit - used)}/${limit} left${bonus > 0 ? ` +${bonus} bonus` : ""}`}
+          </Link>
           <ThemeToggle />
           <form action={logout}>
             <Button type="submit" variant="ghost" size="sm">

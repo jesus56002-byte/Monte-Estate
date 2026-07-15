@@ -26,9 +26,7 @@ export default async function SettingsPage() {
     redirect("/login");
   }
 
-  if (isAdminEmail(user.email, env.ADMIN_EMAILS)) {
-    redirect("/search");
-  }
+  const isAdmin = isAdminEmail(user.email, env.ADMIN_EMAILS);
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -55,12 +53,19 @@ export default async function SettingsPage() {
     <main className="flex flex-1 flex-col items-center gap-10 px-6 py-12">
       <div className="flex flex-col items-center gap-1 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
-          You&apos;re on <span className="font-medium text-foreground">{PLAN_LABELS[currentPlan]}</span> —{" "}
-          {Math.max(0, PLAN_ANALYSIS_LIMITS[currentPlan] - (profile?.plan_analyses_used ?? 0))} of{" "}
-          {PLAN_ANALYSIS_LIMITS[currentPlan]} analyses left
-          {(profile?.bonus_analyses_remaining ?? 0) > 0 ? ` (+${profile?.bonus_analyses_remaining} bonus)` : ""}.
-        </p>
+        {isAdmin ? (
+          <p className="text-muted-foreground">
+            Admin access — unlimited analyses regardless of plan. The plan below reflects your Stripe
+            subscription (if any), not what you&apos;re actually limited to.
+          </p>
+        ) : (
+          <p className="text-muted-foreground">
+            You&apos;re on <span className="font-medium text-foreground">{PLAN_LABELS[currentPlan]}</span> —{" "}
+            {Math.max(0, PLAN_ANALYSIS_LIMITS[currentPlan] - (profile?.plan_analyses_used ?? 0))} of{" "}
+            {PLAN_ANALYSIS_LIMITS[currentPlan]} analyses left
+            {(profile?.bonus_analyses_remaining ?? 0) > 0 ? ` (+${profile?.bonus_analyses_remaining} bonus)` : ""}.
+          </p>
+        )}
       </div>
 
       {!publicAccessEnabled && (
