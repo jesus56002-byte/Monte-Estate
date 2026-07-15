@@ -15,17 +15,18 @@ function CaseCard({
   tone: "negative" | "neutral" | "positive";
 }) {
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardHeader className="pb-0">
         <CardTitle className="text-xs font-normal text-muted-foreground">{label}</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-1">
+      <CardContent className="flex min-w-0 flex-col gap-1">
         <p
           className={cn(
-            "text-xl font-semibold tabular-nums",
+            "truncate text-lg font-semibold tabular-nums sm:text-xl",
             tone === "positive" && "text-success",
             tone === "negative" && "text-destructive"
           )}
+          title={formatCurrency(profit)}
         >
           {formatCurrency(profit)}
         </p>
@@ -46,7 +47,7 @@ export function PercentileSummary({
 }) {
   return (
     <div className="flex w-full flex-col gap-3">
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <CaseCard label="Worst case (5th pct.)" profit={profit.p5} irr={irr.p5} tone="negative" />
         <CaseCard label="Median" profit={profit.p50} irr={irr.p50} tone="neutral" />
         <CaseCard label="Best case (95th pct.)" profit={profit.p95} irr={irr.p95} tone="positive" />
