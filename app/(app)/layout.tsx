@@ -65,7 +65,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="flex items-center gap-3">
           <Link
             href="/settings"
-            className="rounded-full bg-accent/20 px-2.5 py-1 text-xs font-medium text-accent-foreground hover:bg-accent/30"
+            className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground transition-colors duration-200 hover:bg-secondary/70"
           >
             {isAdmin
               ? "Admin access"

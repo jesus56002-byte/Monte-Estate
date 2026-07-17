@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Logo } from "@/components/brand/Logo";
+import { Footer } from "@/components/marketing/Footer";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +12,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </Link>
         <ThemeToggle />
       </header>
-      {children}
+      <div className="flex flex-1 flex-col">{children}</div>
+      <Footer />
     </div>
   );
 }

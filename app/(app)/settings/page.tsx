@@ -50,9 +50,9 @@ export default async function SettingsPage() {
   const billingUnavailable = !publicAccessEnabled || !hasStripeConfig;
 
   return (
-    <main className="flex flex-1 flex-col items-center gap-10 px-6 py-12">
-      <div className="flex flex-col items-center gap-1 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+    <main className="flex flex-1 flex-col items-center gap-10 px-6 py-16">
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         {isAdmin ? (
           <p className="text-muted-foreground">
             Admin access — unlimited analyses regardless of plan. The plan below reflects your Stripe

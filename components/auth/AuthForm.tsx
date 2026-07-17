@@ -67,7 +67,7 @@ export function AuthForm({
             required
             className="mt-0.5 size-4 shrink-0 rounded border-input"
           />
-          <Label htmlFor="termsAccepted" className="text-sm font-normal leading-snug text-muted-foreground">
+          <Label htmlFor="termsAccepted" className="block text-sm font-normal leading-snug text-muted-foreground">
             I have read and agree to the{" "}
             <Link href="/terms" target="_blank" className="font-medium text-foreground underline underline-offset-4">
               Terms & Conditions

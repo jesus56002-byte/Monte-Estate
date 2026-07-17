@@ -8,7 +8,7 @@ export function DealCard({ deal }: { deal: Deal }) {
 
   return (
     <Link href={`/deals/${deal.id}`}>
-      <Card className="transition-colors hover:bg-accent/50">
+      <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:bg-accent/40 hover:shadow-soft-lg">
         <CardHeader>
           <CardTitle className="text-base">{deal.label}</CardTitle>
           <CardDescription>
@@ -18,17 +18,17 @@ export function DealCard({ deal }: { deal: Deal }) {
         <CardContent>
           {result ? (
             <dl className="grid grid-cols-3 gap-4">
-              <div>
+              <div className="min-w-0">
                 <dt className="text-xs text-muted-foreground">Monthly cash flow</dt>
-                <dd className="font-medium">{formatCurrency(result.monthlyCashFlowYear1)}</dd>
+                <dd className="truncate font-medium">{formatCurrency(result.monthlyCashFlowYear1)}</dd>
               </div>
-              <div>
+              <div className="min-w-0">
                 <dt className="text-xs text-muted-foreground">Cap rate</dt>
-                <dd className="font-medium">{formatPercent(result.capRate)}</dd>
+                <dd className="truncate font-medium">{formatPercent(result.capRate)}</dd>
               </div>
-              <div>
+              <div className="min-w-0">
                 <dt className="text-xs text-muted-foreground">Cash-on-cash</dt>
-                <dd className="font-medium">{formatPercent(result.cashOnCash)}</dd>
+                <dd className="truncate font-medium">{formatPercent(result.cashOnCash)}</dd>
               </div>
             </dl>
           ) : (

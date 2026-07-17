@@ -17,7 +17,7 @@ export function LogoMark({ className }: { className?: string }) {
         strokeLinejoin="round"
       />
       <rect x="26.5" y="2" width="3" height="7" rx="0.5" fill="currentColor" />
-      <g fill="var(--accent)">
+      <g fill="var(--brand-lavender)">
         <rect x="7" y="17.5" width="3.4" height="3.4" rx="0.5" />
         <rect x="11.4" y="17.5" width="3.4" height="3.4" rx="0.5" />
         <rect x="21" y="17.5" width="3.4" height="3.4" rx="0.5" />

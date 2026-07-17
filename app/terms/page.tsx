@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Logo } from "@/components/brand/Logo";
+import { Footer } from "@/components/marketing/Footer";
 import { TERMS_VERSION } from "@/lib/terms";
 
 export const metadata = {
@@ -167,9 +168,17 @@ export default function TermsPage() {
         </Section>
 
         <Section title="14. Contact">
-          <p>Questions about these terms can be sent to the contact address associated with your account invitation or provided on our homepage.</p>
+          <p>
+            Questions about these terms can be sent to{" "}
+            <a href="mailto:jesus@saguarodigitalventures.com" className="font-medium text-foreground underline underline-offset-4">
+              jesus@saguarodigitalventures.com
+            </a>
+            .
+          </p>
         </Section>
       </main>
+
+      <Footer />
     </div>
   );
 }

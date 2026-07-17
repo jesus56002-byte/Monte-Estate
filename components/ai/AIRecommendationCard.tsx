@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -108,7 +108,7 @@ export function AIRecommendationCard({
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-base">AI interpretation</CardTitle>
         <Button size="sm" variant={recommendation ? "outline" : "default"} onClick={handleRequest} disabled={status === "loading"}>
-          <Sparkles className="size-4" />
+          {status === "loading" ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
           {status === "loading" ? "Thinking…" : recommendation ? "Regenerate" : "Get AI interpretation"}
         </Button>
       </CardHeader>

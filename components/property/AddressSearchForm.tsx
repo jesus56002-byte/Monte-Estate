@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +45,7 @@ export function AddressSearchForm({
         )}
       </div>
       <Button type="submit" disabled={isSearching}>
+        {isSearching && <Loader2 className="size-4 animate-spin" />}
         {isSearching ? "Searching…" : "Search"}
       </Button>
     </form>
