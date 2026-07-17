@@ -3,8 +3,9 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ShieldCheck, Sparkles } from "lucide-react";
 import { AddressSearchForm } from "@/components/property/AddressSearchForm";
+import { PropertyIllustration } from "@/components/marketing/PropertyIllustration";
 import { Button } from "@/components/ui/button";
 import { createAnalysis } from "@/app/(app)/deals/actions";
 
@@ -31,8 +32,13 @@ export default function SearchPage() {
 
   return (
     <div className="flex flex-1 flex-col items-center gap-10 px-6 py-20">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+        <Sparkles className="size-3.5" />
+        Powerful real estate analysis
+      </span>
+
       <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Search a property</h1>
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Search a property</h1>
         <p className="max-w-md leading-relaxed text-muted-foreground">
           Enter a full address to pull beds, baths, square footage, year built,
           and estimated value and rent, then get instant results, a Monte
@@ -64,6 +70,22 @@ export default function SearchPage() {
           )}
         </div>
       )}
+
+      <div className="relative w-full max-w-2xl pb-10">
+        <PropertyIllustration />
+        <div className="relative z-10 mx-auto -mt-6 flex w-full max-w-lg items-start gap-4 rounded-2xl border bg-card px-6 py-5 shadow-soft-lg">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <ShieldCheck className="size-5" />
+          </span>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-sm font-semibold">This is not financial advice.</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Monte Estate provides educational investment analysis tools.
+              Always do your own research and consult a professional advisor.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
