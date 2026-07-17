@@ -50,3 +50,25 @@ export function formatCurrencyCompact(value: number | null | undefined): string 
   if (value === null || value === undefined || Number.isNaN(value)) return "—";
   return currencyCompactFormatter.format(value);
 }
+
+const shortDateFormatter = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
+const fullDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+
+/** "Saved today" if `dateIso` is today (local time), otherwise "Saved {Mon D}". */
+export function formatSavedBadge(dateIso: string): string {
+  const date = new Date(dateIso);
+  const now = new Date();
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+  return isToday ? "Saved today" : `Saved ${shortDateFormatter.format(date)}`;
+}
+
+export function formatFullDate(dateIso: string): string {
+  return fullDateFormatter.format(new Date(dateIso));
+}
