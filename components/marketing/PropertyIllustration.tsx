@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Soft, decorative desert-meets-real-estate scene for the search page hero:
- * a house, a saguaro, a lavender tree, and a mug resting on two floating
+ * a saguaro, a house, and two lavender trees resting on two floating
  * podiums. Purely illustrative — colors are literal brand hues, not design
  * tokens, since nothing here encodes data or needs theme remapping.
  */
@@ -53,21 +53,21 @@ export function PropertyIllustration({ className }: { className?: string }) {
 
       {/* Saguaro cactus */}
       <g>
-        <rect x="104" y="150" width="26" height="130" rx="13" fill="url(#pi-sage)" />
         <path
-          d="M104 210c-16 0-28-10-28-26v-16c0-9 7-16 16-16s16 7 16 16v14"
+          d="M116 220c-18 0-26-12-26-28v-36"
           fill="none"
           stroke="url(#pi-sage)"
-          strokeWidth="18"
+          strokeWidth="20"
           strokeLinecap="round"
         />
         <path
-          d="M130 226c18 0 30-11 30-28v-14c0-9-7-16-16-16s-16 7-16 16v18"
+          d="M126 198c18 0 26-12 26-28v-32"
           fill="none"
           stroke="url(#pi-sage)"
-          strokeWidth="18"
+          strokeWidth="20"
           strokeLinecap="round"
         />
+        <rect x="108" y="135" width="24" height="145" rx="12" fill="url(#pi-sage)" />
         <ellipse cx="70" cy="272" rx="20" ry="16" fill="url(#pi-sage)" />
       </g>
 
@@ -75,7 +75,7 @@ export function PropertyIllustration({ className }: { className?: string }) {
       <g>
         <path d="M270 176L330 120 390 176V180H270V176Z" fill="url(#pi-roof)" />
         <rect x="262" y="168" width="136" height="16" rx="6" fill="url(#pi-roof)" />
-        <rect x="368" y="96" width="14" height="34" rx="3" fill="url(#pi-lav-soft)" />
+        <rect x="366" y="88" width="14" height="100" rx="3" fill="url(#pi-lav-soft)" />
         <rect x="278" y="182" width="104" height="98" rx="10" fill="url(#pi-wall)" />
         <rect x="312" y="228" width="36" height="52" rx="6" fill="url(#pi-roof)" />
         <circle cx="341" cy="254" r="2.2" fill="#fffdf9" />
@@ -85,11 +85,11 @@ export function PropertyIllustration({ className }: { className?: string }) {
         </g>
       </g>
 
-      {/* Bush */}
+      {/* Small tree */}
       <g>
-        <circle cx="470" cy="266" r="15" fill="url(#pi-lav-soft)" />
-        <circle cx="486" cy="270" r="12" fill="url(#pi-lav-soft)" />
-        <circle cx="458" cy="272" r="11" fill="url(#pi-lav-soft)" />
+        <path d="M470 280V254" stroke="#8a5a3b" strokeWidth="6" strokeLinecap="round" />
+        <circle cx="461" cy="248" r="15" fill="url(#pi-lav-soft)" />
+        <circle cx="479" cy="244" r="18" fill="url(#pi-lav)" />
       </g>
 
       {/* Tree */}
@@ -101,19 +101,13 @@ export function PropertyIllustration({ className }: { className?: string }) {
         <circle cx="588" cy="212" r="24" fill="url(#pi-lav-soft)" />
       </g>
 
-      {/* Mug */}
+      {/* Second tree */}
       <g>
-        <path
-          d="M700 234c11 0 18 7 18 16s-7 16-18 16"
-          fill="none"
-          stroke="url(#pi-lav)"
-          strokeWidth="9"
-          strokeLinecap="round"
-        />
-        <rect x="644" y="220" width="56" height="52" rx="12" fill="url(#pi-lav)" />
-        <rect x="644" y="220" width="56" height="12" rx="6" fill="#7a67d6" opacity="0.6" />
-        <path d="M662 250l10-10 10 10z" fill="#fffdf9" />
-        <rect x="668" y="250" width="8" height="8" fill="#fffdf9" />
+        <path d="M680 280V236" stroke="#8a5a3b" strokeWidth="7" strokeLinecap="round" />
+        <path d="M680 254l-15-13M680 248l17-15" stroke="#8a5a3b" strokeWidth="5" strokeLinecap="round" />
+        <circle cx="658" cy="222" r="22" fill="url(#pi-lav-soft)" />
+        <circle cx="686" cy="210" r="27" fill="url(#pi-lav)" />
+        <circle cx="708" cy="228" r="20" fill="url(#pi-lav-soft)" />
       </g>
     </svg>
   );
