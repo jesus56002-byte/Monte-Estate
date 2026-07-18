@@ -32,6 +32,12 @@ export interface Database {
           terms_version: string | null;
           phone: string | null;
           cancel_at_period_end: boolean;
+          default_appreciation_pct: number;
+          default_vacancy_pct: number;
+          default_maintenance_pct: number;
+          default_closing_cost_pct: number;
+          default_insurance_pct: number;
+          lifetime_analyses_count: number;
           created_at: string;
           updated_at: string;
         };
@@ -52,6 +58,12 @@ export interface Database {
           terms_version?: string | null;
           phone?: string | null;
           cancel_at_period_end?: boolean;
+          default_appreciation_pct?: number;
+          default_vacancy_pct?: number;
+          default_maintenance_pct?: number;
+          default_closing_cost_pct?: number;
+          default_insurance_pct?: number;
+          lifetime_analyses_count?: number;
         };
         Update: {
           display_name?: string | null;
@@ -69,6 +81,12 @@ export interface Database {
           terms_version?: string | null;
           phone?: string | null;
           cancel_at_period_end?: boolean;
+          default_appreciation_pct?: number;
+          default_vacancy_pct?: number;
+          default_maintenance_pct?: number;
+          default_closing_cost_pct?: number;
+          default_insurance_pct?: number;
+          lifetime_analyses_count?: number;
         };
         Relationships: [];
       };
@@ -126,6 +144,26 @@ export interface Database {
         };
         Relationships: [];
       };
+      feedback: {
+        Row: {
+          id: string;
+          user_id: string;
+          category: string;
+          message: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          category: string;
+          message: string;
+        };
+        Update: {
+          category?: string;
+          message?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -140,6 +178,10 @@ export interface Database {
       };
       credit_bonus_analyses: {
         Args: { p_user_id: string; p_amount: number };
+        Returns: undefined;
+      };
+      increment_lifetime_analyses_count: {
+        Args: { p_user_id: string };
         Returns: undefined;
       };
     };

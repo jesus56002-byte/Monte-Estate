@@ -91,8 +91,22 @@ export async function createAnalysis(address: string): Promise<CreateAnalysisRes
     getRentEstimate(resolvedAddress, hints).catch(() => null),
   ]);
 
+  const { data: defaultsProfile } = await supabase
+    .from("profiles")
+    .select(
+      "default_appreciation_pct, default_vacancy_pct, default_maintenance_pct, default_closing_cost_pct, default_insurance_pct"
+    )
+    .eq("id", user.id)
+    .single();
+
   const property = normalizeRentCastData(resolvedAddress, record, value, rent);
-  const investmentInputsForm = deriveDefaultInputs(property);
+  const investmentInputsForm = deriveDefaultInputs(property, {
+    appreciationPct: defaultsProfile?.default_appreciation_pct,
+    vacancyPct: defaultsProfile?.default_vacancy_pct,
+    maintenancePct: defaultsProfile?.default_maintenance_pct,
+    closingCostPct: defaultsProfile?.default_closing_cost_pct,
+    insurancePct: defaultsProfile?.default_insurance_pct,
+  });
   const investmentInputs = toInvestmentInputs(investmentInputsForm);
   const calculatedResults = runAnalysis(investmentInputs);
 
@@ -160,6 +174,15 @@ export async function createAnalysis(address: string): Promise<CreateAnalysisRes
 
   if (insertError || !inserted) {
     return { error: insertError?.message ?? "Couldn't save this analysis." };
+  }
+
+  // Decorative lifetime stat shown on Settings > About — best-effort, never
+  // blocks saving the analysis itself.
+  const { error: incrementError } = await supabase.rpc("increment_lifetime_analyses_count", {
+    p_user_id: user.id,
+  });
+  if (incrementError) {
+    console.error("[createAnalysis] failed to increment lifetime_analyses_count:", incrementError.message);
   }
 
   revalidatePath("/deals");
