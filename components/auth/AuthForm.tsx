@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import type { AuthActionState } from "@/app/(auth)/actions";
 
 const initialState: AuthActionState = { error: null, info: null };
@@ -88,6 +89,8 @@ export function AuthForm({
       <Button type="submit" disabled={pending}>
         {pending ? "Please wait…" : isLogin ? "Log in" : "Create account"}
       </Button>
+
+      <SocialAuthButtons />
 
       <p className="text-center text-sm text-muted-foreground">
         {isLogin ? (
