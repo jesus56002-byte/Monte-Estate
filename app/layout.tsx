@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Monte Estate",
   description: "Property search and investment analysis with Monte Carlo simulation.",
+  verification: {
+    other: {
+      "facebook-domain-verification": "8wckko82r4hjzcbny62vfpkfavfbws",
+    },
+  },
 };
 
 export default function RootLayout({
