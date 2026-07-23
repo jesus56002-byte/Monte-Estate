@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { env, hasStripeConfig, publicAccessEnabled } from "@/lib/env";
 import { requireApiUser } from "@/lib/api/requireApiUser";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripeClient } from "@/lib/stripe/client";
 import { TOPUP_ANALYSES } from "@/lib/plans";
 
@@ -79,7 +80,11 @@ export async function POST(request: Request) {
       metadata: { supabase_user_id: user.id },
     });
     customerId = customer.id;
-    await supabase.from("profiles").update({ stripe_customer_id: customerId }).eq("id", user.id);
+    // stripe_customer_id isn't user-writable via the RLS-scoped client (a
+    // user could otherwise point their own row at someone else's Stripe
+    // customer and reach their billing portal) — write it with the
+    // service-role client instead, same as every other billing field.
+    await createAdminClient().from("profiles").update({ stripe_customer_id: customerId }).eq("id", user.id);
   }
 
   const session =

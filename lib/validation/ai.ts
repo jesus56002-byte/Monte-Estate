@@ -51,3 +51,15 @@ export const aiRecommendationRequestSchema = z.object({
 });
 
 export type AIRecommendationRequest = z.infer<typeof aiRecommendationRequestSchema>;
+
+/**
+ * The incoming body for POST /api/ai-recommendation ("Regenerate"), which
+ * additionally requires the deal being regenerated for so the route can
+ * verify ownership — the base schema above is also used to type
+ * generateRecommendation()'s parameter for the in-process call from
+ * createAnalysis/createCustomAnalysis, where no deal (and no HTTP request)
+ * exists yet.
+ */
+export const regenerateRecommendationRequestSchema = aiRecommendationRequestSchema.extend({
+  dealId: z.string().uuid(),
+});

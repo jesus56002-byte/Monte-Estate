@@ -104,6 +104,7 @@ export function DealWorkspace({ deal }: { deal: Deal }) {
             onSummaryChange={handleSummaryChange}
           />
           <AIRecommendationCard
+            dealId={deal.id}
             property={deal.propertySnapshot}
             investmentInputs={investmentInputs}
             analysisResult={result}

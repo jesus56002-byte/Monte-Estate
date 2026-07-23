@@ -1,3 +1,4 @@
+import "server-only";
 import { env, hasSupabaseConfig } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {

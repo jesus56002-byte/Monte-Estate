@@ -29,6 +29,7 @@ const VERDICT_TONE: Record<AIRecommendation["verdict"], string> = {
 type Status = "idle" | "loading" | "error" | "success";
 
 export function AIRecommendationCard({
+  dealId,
   property,
   investmentInputs,
   analysisResult,
@@ -36,6 +37,7 @@ export function AIRecommendationCard({
   initialRecommendation = null,
   onRecommendationChange,
 }: {
+  dealId: string;
   property: PropertyData;
   investmentInputs: InvestmentInputs;
   analysisResult: AnalysisResult;
@@ -58,6 +60,7 @@ export function AIRecommendationCard({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          dealId,
           property: {
             address: property.address,
             bedrooms: property.bedrooms,
