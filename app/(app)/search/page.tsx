@@ -3,11 +3,23 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, ShieldCheck, Sparkles } from "lucide-react";
+import { AlertCircle, Home, ShieldCheck, SlidersHorizontal, Sparkles } from "lucide-react";
 import { AddressSearchForm } from "@/components/property/AddressSearchForm";
 import { PropertyIllustration } from "@/components/marketing/PropertyIllustration";
 import { Button } from "@/components/ui/button";
 import { createAnalysis } from "@/app/(app)/deals/actions";
+
+function OrDivider() {
+  return (
+    <div className="flex w-full items-center gap-3 lg:w-auto lg:flex-col lg:self-stretch">
+      <div className="h-px flex-1 bg-border lg:h-auto lg:w-px lg:flex-1" />
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+        or
+      </span>
+      <div className="h-px flex-1 bg-border lg:h-auto lg:w-px lg:flex-1" />
+    </div>
+  );
+}
 
 export default function SearchPage() {
   const router = useRouter();
@@ -38,24 +50,48 @@ export default function SearchPage() {
       </span>
 
       <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Search a property</h1>
-        <p className="max-w-md leading-relaxed text-muted-foreground">
-          Enter a full address to pull beds, baths, square footage, year built,
-          and estimated value and rent, then get instant results, a Monte
-          Carlo simulation, and an AI interpretation.
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Start an analysis</h1>
+        <p className="max-w-lg leading-relaxed text-muted-foreground">
+          Search a real address or build your own scenario — either way, get instant results, a
+          Monte Carlo simulation, and an AI interpretation.
         </p>
       </div>
 
-      <div className="flex w-full max-w-xl flex-col items-center gap-3">
-        <AddressSearchForm onSearch={handleSearch} isSearching={isPending} />
-        {isPending && (
-          <p className="text-xs text-muted-foreground">
-            Looking up property data and running your analysis — this takes a few seconds…
-          </p>
-        )}
-        <Link href="/search/custom" className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground">
-          Or analyze a custom scenario without an address
-        </Link>
+      <div className="flex w-full max-w-4xl flex-col items-stretch gap-6 lg:flex-row">
+        <div className="flex flex-1 flex-col items-center gap-4 rounded-2xl border bg-card p-6 text-center shadow-soft">
+          <span className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Home className="size-5" />
+          </span>
+          <div className="flex flex-col gap-1">
+            <h2 className="font-semibold">Search by address</h2>
+            <p className="text-sm text-muted-foreground">
+              Auto-fill beds, baths, square footage, and estimated value and rent.
+            </p>
+          </div>
+          <AddressSearchForm onSearch={handleSearch} isSearching={isPending} />
+          {isPending && (
+            <p className="text-xs text-muted-foreground">
+              Looking up property data and running your analysis — this takes a few seconds…
+            </p>
+          )}
+        </div>
+
+        <OrDivider />
+
+        <div className="flex flex-1 flex-col items-center gap-4 rounded-2xl border bg-card p-6 text-center shadow-soft">
+          <span className="flex size-11 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
+            <SlidersHorizontal className="size-5" />
+          </span>
+          <div className="flex flex-col gap-1">
+            <h2 className="font-semibold">Custom scenario</h2>
+            <p className="text-sm text-muted-foreground">
+              No address needed — enter your own purchase price, financing, and assumptions.
+            </p>
+          </div>
+          <Button asChild size="lg" variant="outline" className="w-full max-w-xs">
+            <Link href="/search/custom">Analyze a custom scenario</Link>
+          </Button>
+        </div>
       </div>
 
       {errorMessage && (
