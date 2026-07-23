@@ -9,10 +9,14 @@ import { GoogleIcon, FacebookIcon, AppleIcon } from "@/components/auth/BrandIcon
 
 type Provider = "google" | "facebook" | "apple";
 
-const PROVIDERS: { id: Provider; label: string; icon: typeof GoogleIcon }[] = [
-  { id: "google", label: "Continue with Google", icon: GoogleIcon },
-  { id: "facebook", label: "Continue with Facebook", icon: FacebookIcon },
-  { id: "apple", label: "Continue with Apple", icon: AppleIcon },
+const PROVIDERS: { id: Provider; label: string; icon: typeof GoogleIcon; enabled: boolean }[] = [
+  { id: "google", label: "Continue with Google", icon: GoogleIcon, enabled: true },
+  { id: "facebook", label: "Continue with Facebook", icon: FacebookIcon, enabled: true },
+  // Apple requires a paid Apple Developer account + Services ID/key setup
+  // that hasn't been done yet. The click handler below already supports
+  // "apple" as a provider — once the Apple Developer + Supabase provider
+  // setup is done, flip this back to `true`, no other changes needed.
+  { id: "apple", label: "Continue with Apple", icon: AppleIcon, enabled: false },
 ];
 
 export function SocialAuthButtons() {
@@ -57,7 +61,7 @@ export function SocialAuthButtons() {
       </p>
 
       <div className="flex flex-col gap-2">
-        {PROVIDERS.map(({ id, label, icon: Icon }) => (
+        {PROVIDERS.filter((provider) => provider.enabled).map(({ id, label, icon: Icon }) => (
           <Button
             key={id}
             type="button"
