@@ -53,6 +53,9 @@ export default function SearchPage() {
             Looking up property data and running your analysis — this takes a few seconds…
           </p>
         )}
+        <Link href="/search/custom" className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground">
+          Or analyze a custom scenario without an address
+        </Link>
       </div>
 
       {errorMessage && (

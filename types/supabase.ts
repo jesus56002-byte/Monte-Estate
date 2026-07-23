@@ -38,6 +38,7 @@ export interface Database {
           default_closing_cost_pct: number;
           default_insurance_pct: number;
           lifetime_analyses_count: number;
+          custom_deal_counter: number;
           created_at: string;
           updated_at: string;
         };
@@ -64,6 +65,7 @@ export interface Database {
           default_closing_cost_pct?: number;
           default_insurance_pct?: number;
           lifetime_analyses_count?: number;
+          custom_deal_counter?: number;
         };
         Update: {
           display_name?: string | null;
@@ -87,6 +89,7 @@ export interface Database {
           default_closing_cost_pct?: number;
           default_insurance_pct?: number;
           lifetime_analyses_count?: number;
+          custom_deal_counter?: number;
         };
         Relationships: [];
       };
@@ -218,6 +221,10 @@ export interface Database {
           total_sessions: number;
           bounced_sessions: number;
         }[];
+      };
+      increment_custom_deal_counter: {
+        Args: { p_user_id: string };
+        Returns: number;
       };
     };
   };

@@ -10,21 +10,167 @@ import { getPropertyRecord, getRentEstimate, getValueEstimate } from "@/lib/rent
 import { RentCastApiError } from "@/lib/rentcast/types";
 import { normalizeRentCastData } from "@/lib/rentcast/normalize";
 import { deriveDefaultInputs } from "@/lib/utils/defaults";
-import { toInvestmentInputs, type InvestmentInputsFormValues } from "@/lib/validation/investment";
+import {
+  investmentInputsFormSchema,
+  toInvestmentInputs,
+  type InvestmentInputsFormValues,
+} from "@/lib/validation/investment";
 import { runAnalysis } from "@/lib/finance/analysis";
 import { generateRecommendation } from "@/lib/anthropic/recommendation";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 import type { Database, Json } from "@/types/supabase";
-import type { AnalysisResult } from "@/lib/finance/types";
+import type { AnalysisResult, InvestmentInputs } from "@/lib/finance/types";
 import type { SimulationSummary } from "@/types/deal";
+import type { PropertyData } from "@/types/property";
 import type { AIRecommendation } from "@/lib/validation/ai";
 
 export type CreateAnalysisResult = { dealId: string } | { error: string; code?: string };
 
 /**
- * The single entry point for "performing an analysis": looks up the address,
- * checks/consumes the caller's quota, runs the deterministic calculation,
- * generates an AI interpretation, and saves all of it as a deal row
- * immediately. There's no separate "preview" step and no unsaved-in-memory
+ * Shared quota gate for both entry points (address search and custom
+ * scenario) — admins bypass it entirely, everyone else spends one credit
+ * per analysis regardless of which path produced it. Returns null when the
+ * caller is clear to proceed.
+ */
+async function consumeQuotaOrError(
+  supabase: SupabaseClient<Database>,
+  user: User
+): Promise<{ error: string; code?: string } | null> {
+  if (isAdminEmail(user.email, env.ADMIN_EMAILS)) {
+    return null;
+  }
+
+  const { data: creditRows, error: creditError } = await supabase.rpc("consume_analysis_credit", {
+    p_user_id: user.id,
+  });
+  const credit = creditRows?.[0];
+  if (creditError || !credit) {
+    return { error: "Couldn't verify your analysis quota. Try again." };
+  }
+  if (!credit.allowed) {
+    return {
+      error:
+        credit.plan === "free"
+          ? "You've used all 3 free analyses. Upgrade to Starter or Investor for more."
+          : "You've used all your analyses for this billing period. Buy 10 more, or upgrade your plan.",
+      code: "QUOTA_EXCEEDED",
+    };
+  }
+  return null;
+}
+
+/**
+ * Auto-generated once, right when the analysis is created — not on every
+ * subsequent page view, since (unlike the client-side Monte Carlo) each call
+ * costs real Anthropic API spend. A failure here shouldn't block saving the
+ * analysis; the user can retry with "Regenerate" afterward.
+ */
+async function buildAiRecommendation(
+  property: PropertyData,
+  investmentInputs: InvestmentInputs,
+  calculatedResults: AnalysisResult
+): Promise<AIRecommendation | null> {
+  if (!hasAnthropicKey) return null;
+
+  try {
+    return await generateRecommendation({
+      property: {
+        address: property.address,
+        bedrooms: property.bedrooms,
+        bathrooms: property.bathrooms,
+        squareFootage: property.squareFootage,
+        yearBuilt: property.yearBuilt,
+      },
+      investmentInputs: {
+        purchasePrice: investmentInputs.purchasePrice,
+        downPaymentPct: investmentInputs.downPaymentPct,
+        interestRatePct: investmentInputs.interestRatePct,
+        loanTermYears: investmentInputs.loanTermYears,
+        monthlyRent: investmentInputs.monthlyRent,
+        holdingPeriodYears: investmentInputs.holdingPeriodYears,
+        appreciationPct: investmentInputs.appreciationPct,
+        rentGrowthPct: investmentInputs.rentGrowthPct,
+        vacancyPct: investmentInputs.vacancyPct,
+      },
+      analysisResult: {
+        monthlyCashFlowYear1: calculatedResults.monthlyCashFlowYear1,
+        capRate: calculatedResults.capRate,
+        cashOnCash: calculatedResults.cashOnCash,
+        irr: calculatedResults.irr,
+        totalProfit: calculatedResults.totalProfit,
+      },
+    });
+  } catch (error) {
+    console.error("[analysis] AI interpretation generation failed:", error);
+    return null;
+  }
+}
+
+interface NewDealFields {
+  label: string;
+  address: string;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  propertySnapshot: PropertyData;
+  investmentInputsForm: InvestmentInputsFormValues;
+  calculatedResults: AnalysisResult;
+  aiRecommendation: AIRecommendation | null;
+}
+
+/** Inserts the deal row, bumps the lifetime analyses stat (best-effort), and revalidates the deals list. */
+async function saveNewDeal(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  fields: NewDealFields
+): Promise<CreateAnalysisResult> {
+  const { data: inserted, error: insertError } = await supabase
+    .from("deals")
+    .insert({
+      user_id: userId,
+      label: fields.label,
+      address: fields.address,
+      city: fields.city,
+      state: fields.state,
+      zip: fields.zip,
+      latitude: fields.latitude,
+      longitude: fields.longitude,
+      // Domain types don't carry an index signature, so a structural cast
+      // through `unknown` is required to store them in a jsonb column — see
+      // lib/deals/mapRow.ts for the corresponding read-side cast.
+      property_snapshot: fields.propertySnapshot as unknown as Json,
+      investment_inputs: fields.investmentInputsForm as unknown as Json,
+      calculated_results: fields.calculatedResults as unknown as Json,
+      simulation_summary: null,
+      ai_recommendation: fields.aiRecommendation as unknown as Json,
+    })
+    .select("id")
+    .single();
+
+  if (insertError || !inserted) {
+    return { error: insertError?.message ?? "Couldn't save this analysis." };
+  }
+
+  // Decorative lifetime stat shown on Settings > About — best-effort, never
+  // blocks saving the analysis itself.
+  const { error: incrementError } = await supabase.rpc("increment_lifetime_analyses_count", {
+    p_user_id: userId,
+  });
+  if (incrementError) {
+    console.error("[analysis] failed to increment lifetime_analyses_count:", incrementError.message);
+  }
+
+  revalidatePath("/deals");
+  return { dealId: inserted.id };
+}
+
+/**
+ * The address-search entry point for "performing an analysis": looks up the
+ * address, checks/consumes the caller's quota, runs the deterministic
+ * calculation, generates an AI interpretation, and saves all of it as a deal
+ * row immediately. There's no separate "preview" step and no unsaved-in-memory
  * analysis state — every analysis a user runs is a saved deal from the
  * moment it's created, which is what makes it survive a refresh or back
  * navigation without re-spending RentCast calls or plan quota.
@@ -59,26 +205,9 @@ export async function createAnalysis(address: string): Promise<CreateAnalysisRes
   }
 
   // Quota is only spent once we know the address actually resolved — a typo
-  // shouldn't cost the user one of their limited analyses. Admins bypass the
-  // quota entirely, same as they bypass the subscription paywall.
-  if (!isAdminEmail(user.email, env.ADMIN_EMAILS)) {
-    const { data: creditRows, error: creditError } = await supabase.rpc("consume_analysis_credit", {
-      p_user_id: user.id,
-    });
-    const credit = creditRows?.[0];
-    if (creditError || !credit) {
-      return { error: "Couldn't verify your analysis quota. Try again." };
-    }
-    if (!credit.allowed) {
-      return {
-        error:
-          credit.plan === "free"
-            ? "You've used all 3 free analyses. Upgrade to Starter or Investor for more."
-            : "You've used all your analyses for this billing period. Buy 10 more, or upgrade your plan.",
-        code: "QUOTA_EXCEEDED",
-      };
-    }
-  }
+  // shouldn't cost the user one of their limited analyses.
+  const quotaError = await consumeQuotaOrError(supabase, user);
+  if (quotaError) return quotaError;
 
   const hints = {
     propertyType: record.propertyType,
@@ -109,84 +238,102 @@ export async function createAnalysis(address: string): Promise<CreateAnalysisRes
   });
   const investmentInputs = toInvestmentInputs(investmentInputsForm);
   const calculatedResults = runAnalysis(investmentInputs);
+  const aiRecommendation = await buildAiRecommendation(property, investmentInputs, calculatedResults);
 
-  // Auto-generated once, right when the analysis is created — not on every
-  // subsequent page view, since (unlike the client-side Monte Carlo) each
-  // call costs real Anthropic API spend. A failure here shouldn't block
-  // saving the analysis; the user can retry with "Regenerate" afterward.
-  let aiRecommendation: AIRecommendation | null = null;
-  if (hasAnthropicKey) {
-    try {
-      aiRecommendation = await generateRecommendation({
-        property: {
-          address: property.address,
-          bedrooms: property.bedrooms,
-          bathrooms: property.bathrooms,
-          squareFootage: property.squareFootage,
-          yearBuilt: property.yearBuilt,
-        },
-        investmentInputs: {
-          purchasePrice: investmentInputs.purchasePrice,
-          downPaymentPct: investmentInputs.downPaymentPct,
-          interestRatePct: investmentInputs.interestRatePct,
-          loanTermYears: investmentInputs.loanTermYears,
-          monthlyRent: investmentInputs.monthlyRent,
-          holdingPeriodYears: investmentInputs.holdingPeriodYears,
-          appreciationPct: investmentInputs.appreciationPct,
-          rentGrowthPct: investmentInputs.rentGrowthPct,
-          vacancyPct: investmentInputs.vacancyPct,
-        },
-        analysisResult: {
-          monthlyCashFlowYear1: calculatedResults.monthlyCashFlowYear1,
-          capRate: calculatedResults.capRate,
-          cashOnCash: calculatedResults.cashOnCash,
-          irr: calculatedResults.irr,
-          totalProfit: calculatedResults.totalProfit,
-        },
-      });
-    } catch (error) {
-      console.error("[createAnalysis] AI interpretation generation failed:", error);
-    }
-  }
-
-  const { data: inserted, error: insertError } = await supabase
-    .from("deals")
-    .insert({
-      user_id: user.id,
-      label: property.address,
-      address: property.address,
-      city: property.city,
-      state: property.state,
-      zip: property.zipCode,
-      latitude: property.latitude,
-      longitude: property.longitude,
-      // Domain types don't carry an index signature, so a structural cast
-      // through `unknown` is required to store them in a jsonb column — see
-      // lib/deals/mapRow.ts for the corresponding read-side cast.
-      property_snapshot: property as unknown as Json,
-      investment_inputs: investmentInputsForm as unknown as Json,
-      calculated_results: calculatedResults as unknown as Json,
-      simulation_summary: null,
-      ai_recommendation: aiRecommendation as unknown as Json,
-    })
-    .select("id")
-    .single();
-
-  if (insertError || !inserted) {
-    return { error: insertError?.message ?? "Couldn't save this analysis." };
-  }
-
-  // Decorative lifetime stat shown on Settings > About — best-effort, never
-  // blocks saving the analysis itself.
-  const { error: incrementError } = await supabase.rpc("increment_lifetime_analyses_count", {
-    p_user_id: user.id,
+  return saveNewDeal(supabase, user.id, {
+    label: property.address,
+    address: property.address,
+    city: property.city,
+    state: property.state,
+    zip: property.zipCode,
+    latitude: property.latitude,
+    longitude: property.longitude,
+    propertySnapshot: property,
+    investmentInputsForm,
+    calculatedResults,
+    aiRecommendation,
   });
-  if (incrementError) {
-    console.error("[createAnalysis] failed to increment lifetime_analyses_count:", incrementError.message);
+}
+
+/**
+ * The custom-scenario entry point: no address, no RentCast lookup — every
+ * investment assumption comes straight from the user. Otherwise identical
+ * to createAnalysis (same quota, same AI interpretation, same save path),
+ * so a custom scenario behaves exactly like any other saved deal. Deals
+ * left unnamed get "Custom Deal N", numbered per-user via an atomic
+ * counter on the profile so concurrent creates can't collide.
+ */
+export async function createCustomAnalysis(
+  formValues: InvestmentInputsFormValues,
+  name: string | undefined
+): Promise<CreateAnalysisResult> {
+  const { supabase, user } = await getAuthedUser();
+  if (!user) {
+    return { error: "You must be signed in to run an analysis." };
   }
 
-  revalidatePath("/deals");
-  return { dealId: inserted.id };
+  const parsed = investmentInputsFormSchema.safeParse(formValues);
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Invalid input." };
+  }
+
+  const quotaError = await consumeQuotaOrError(supabase, user);
+  if (quotaError) return quotaError;
+
+  let dealName = name?.trim();
+  if (!dealName) {
+    const { data: nextNumber, error: counterError } = await supabase.rpc("increment_custom_deal_counter", {
+      p_user_id: user.id,
+    });
+    if (counterError || nextNumber == null) {
+      return { error: "Couldn't generate a name for this deal. Try again." };
+    }
+    dealName = `Custom Deal ${nextNumber}`;
+  }
+
+  const investmentInputsForm = parsed.data;
+  const investmentInputs = toInvestmentInputs(investmentInputsForm);
+  const calculatedResults = runAnalysis(investmentInputs);
+
+  const property: PropertyData = {
+    address: dealName,
+    city: null,
+    state: null,
+    zipCode: null,
+    latitude: null,
+    longitude: null,
+    propertyType: null,
+    bedrooms: null,
+    bathrooms: null,
+    squareFootage: null,
+    yearBuilt: null,
+    lotSize: null,
+    hoaFeeMonthly: investmentInputsForm.hoaMonthly,
+    estimatedValue: investmentInputsForm.purchasePrice,
+    estimatedValueRangeLow: null,
+    estimatedValueRangeHigh: null,
+    estimatedRent: investmentInputsForm.monthlyRent,
+    estimatedRentRangeLow: null,
+    estimatedRentRangeHigh: null,
+    source: "custom",
+    fetchedAt: new Date().toISOString(),
+  };
+
+  const aiRecommendation = await buildAiRecommendation(property, investmentInputs, calculatedResults);
+
+  return saveNewDeal(supabase, user.id, {
+    label: dealName,
+    address: "Custom scenario",
+    city: null,
+    state: null,
+    zip: null,
+    latitude: null,
+    longitude: null,
+    propertySnapshot: property,
+    investmentInputsForm,
+    calculatedResults,
+    aiRecommendation,
+  });
 }
 
 export type UpdateDealPatch = {

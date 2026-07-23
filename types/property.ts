@@ -24,6 +24,7 @@ export interface PropertyData {
   estimatedRentRangeLow: number | null;
   estimatedRentRangeHigh: number | null;
 
-  source: "rentcast";
+  /** "custom" is a user-entered scenario with no real property behind it — see createCustomAnalysis. */
+  source: "rentcast" | "custom";
   fetchedAt: string;
 }
