@@ -1,10 +1,27 @@
-import { env } from "@/lib/env";
+import { env, hasSupabaseConfig } from "@/lib/env";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   RentCastApiError,
   type RentCastPropertyRecord,
   type RentCastRentEstimate,
   type RentCastValueEstimate,
 } from "@/lib/rentcast/types";
+
+/**
+ * Durable log of outbound RentCast calls, for the admin dashboard's
+ * "requests this month" stat — the in-memory `requestCount` below resets on
+ * every deploy/cold start, so it can't answer that. Fire-and-forget: a
+ * logging failure should never break an actual property lookup.
+ */
+function logRentCastRequest(): void {
+  if (!hasSupabaseConfig) return;
+  createAdminClient()
+    .from("rentcast_request_log")
+    .insert({})
+    .then(({ error }) => {
+      if (error) console.error("[RentCast] failed to log request:", error.message);
+    });
+}
 
 const BASE_URL = "https://api.rentcast.io/v1";
 
@@ -44,6 +61,8 @@ async function rentcastGet<T>(path: string, params: Record<string, string | numb
     // a short cache keeps repeated lookups of the same address cheap.
     next: { revalidate: 3600 },
   });
+
+  logRentCastRequest();
 
   if (res.status === 404) {
     throw new RentCastApiError("No property found for that address.", 404);

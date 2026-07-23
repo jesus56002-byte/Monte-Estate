@@ -164,6 +164,32 @@ export interface Database {
         };
         Relationships: [];
       };
+      page_views: {
+        Row: {
+          id: string;
+          session_id: string;
+          path: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          session_id: string;
+          path: string;
+        };
+        Update: never;
+        Relationships: [];
+      };
+      rentcast_request_log: {
+        Row: {
+          id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+        };
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -183,6 +209,15 @@ export interface Database {
       increment_lifetime_analyses_count: {
         Args: { p_user_id: string };
         Returns: undefined;
+      };
+      get_page_view_stats: {
+        Args: { p_start: string; p_end: string };
+        Returns: {
+          total_views: number;
+          unique_visitors: number;
+          total_sessions: number;
+          bounced_sessions: number;
+        }[];
       };
     };
   };
