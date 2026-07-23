@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
 
 /**
- * Twin-roof "M" mark matching the Monte Estate brand icon: a bold, chunky
- * roofline (thick round stroke, not a thin line) with a chimney block and a
- * 2x2 window grid tucked under each peak — same proportions as the source
- * logo artwork, just recolored via currentColor for light/dark contexts.
+ * Twin-roof "M" mark matching the Monte Estate brand icon: a clean outline
+ * roofline (not a chunky stroke) with a chimney block and a 2x2 window grid
+ * tucked under each peak — same proportions as the source logo artwork,
+ * just recolored via currentColor for light/dark contexts.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
@@ -17,20 +17,20 @@ export function LogoMark({ className }: { className?: string }) {
       <path
         d="M3 28V16.5L11 7.5L18 15L25 7.5L33 16.5V28"
         stroke="currentColor"
-        strokeWidth="5"
+        strokeWidth="3.2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <rect x="26.8" y="2" width="3.6" height="8" rx="1" fill="currentColor" />
+      <rect x="27.2" y="3" width="2.8" height="7" rx="0.8" fill="currentColor" />
       <g fill="var(--brand-lavender)">
-        <rect x="7.6" y="19.4" width="3" height="3" rx="0.7" />
-        <rect x="11.4" y="19.4" width="3" height="3" rx="0.7" />
-        <rect x="7.6" y="23.2" width="3" height="3" rx="0.7" />
-        <rect x="11.4" y="23.2" width="3" height="3" rx="0.7" />
-        <rect x="21.6" y="19.4" width="3" height="3" rx="0.7" />
-        <rect x="25.4" y="19.4" width="3" height="3" rx="0.7" />
-        <rect x="21.6" y="23.2" width="3" height="3" rx="0.7" />
-        <rect x="25.4" y="23.2" width="3" height="3" rx="0.7" />
+        <rect x="7.7" y="19.6" width="2.8" height="2.8" rx="0.6" />
+        <rect x="11.3" y="19.6" width="2.8" height="2.8" rx="0.6" />
+        <rect x="7.7" y="23.2" width="2.8" height="2.8" rx="0.6" />
+        <rect x="11.3" y="23.2" width="2.8" height="2.8" rx="0.6" />
+        <rect x="21.7" y="19.6" width="2.8" height="2.8" rx="0.6" />
+        <rect x="25.3" y="19.6" width="2.8" height="2.8" rx="0.6" />
+        <rect x="21.7" y="23.2" width="2.8" height="2.8" rx="0.6" />
+        <rect x="25.3" y="23.2" width="2.8" height="2.8" rx="0.6" />
       </g>
     </svg>
   );

@@ -32,16 +32,16 @@ const FEATURES: { icon: LucideIcon; title: string; description: string }[] = [
 
 const STEPS = [
   {
-    title: "Enter an address",
-    description: "We pull accurate value, rent, and comp data from a real address — automatically, no manual entry.",
+    title: "Pick your path",
+    description: "Search a real address for auto-filled value, rent, and comp data — or skip it and enter your own numbers for a fully custom scenario.",
   },
   {
     title: "Tune your assumptions",
-    description: "Adjust financing, expenses, and growth — or skip the address and build a fully custom scenario.",
+    description: "Adjust financing, expenses, and growth rates to match your deal, either way.",
   },
   {
     title: "Get your answer",
-    description: "That data feeds a 10,000-trial Monte Carlo simulation and an AI read — instant, and free for your first 3 analyses.",
+    description: "It feeds a 10,000-trial Monte Carlo simulation and an AI read — instant, and free for your first 3 analyses.",
   },
 ];
 
