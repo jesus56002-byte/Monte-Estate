@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { Check, TrendingUp, Search, Calculator, Activity, Sparkles, Sun } from "lucide-react";
+import { Check, Database, Calculator, Activity, Sparkles, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Logo } from "@/components/brand/Logo";
@@ -9,9 +9,9 @@ import { publicAccessEnabled } from "@/lib/env";
 
 const FEATURES: { icon: LucideIcon; title: string; description: string }[] = [
   {
-    icon: Search,
-    title: "Property search",
-    description: "Enter a real address and auto-populate beds, baths, square footage, and estimated value and rent.",
+    icon: Database,
+    title: "Real property data",
+    description: "Live value, rent, and comps from a real address — or skip the address and build a custom scenario.",
   },
   {
     icon: Calculator,
@@ -21,7 +21,7 @@ const FEATURES: { icon: LucideIcon; title: string; description: string }[] = [
   {
     icon: Activity,
     title: "Monte Carlo simulation",
-    description: "10,000 trials show the realistic range of outcomes — worst, median, and best case — not just one guess.",
+    description: "10,000 trials grounded in real data — not guesses — show the worst, median, and best case.",
   },
   {
     icon: Sparkles,
@@ -33,15 +33,15 @@ const FEATURES: { icon: LucideIcon; title: string; description: string }[] = [
 const STEPS = [
   {
     title: "Enter an address",
-    description: "We pull property details and estimated value and rent automatically — no manual data entry.",
+    description: "We pull accurate value, rent, and comp data from a real address — automatically, no manual entry.",
   },
   {
     title: "Tune your assumptions",
-    description: "Adjust financing, expenses, and growth rates to match your actual deal.",
+    description: "Adjust financing, expenses, and growth — or skip the address and build a fully custom scenario.",
   },
   {
     title: "Get your answer",
-    description: "Instant results, a Monte Carlo simulation, and an AI interpretation — all in one place, saved for later.",
+    description: "That data feeds a 10,000-trial Monte Carlo simulation and an AI read — instant, and free for your first 3 analyses.",
   },
 ];
 
@@ -89,15 +89,15 @@ export default function Home() {
         <div className="relative mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-16 px-6 py-20 lg:grid-cols-2 lg:py-28">
           <div className="flex flex-col items-start gap-6 text-left">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-              <TrendingUp className="size-3.5" />
-              Your spreadsheet could never
+              <Database className="size-3.5" />
+              Real data. Real simulations.
             </span>
             <h1 className="max-w-xl text-4xl leading-[1.1] font-bold tracking-tight sm:text-5xl">
               Analyze real estate investments with confidence.
             </h1>
             <p className="max-w-lg text-lg leading-relaxed text-muted-foreground">
-              Monte Estate combines Monte Carlo simulation, property data, and AI-powered insights to help
-              investors evaluate opportunities before committing capital.
+              Real property data — value, rent, comps — feeds a 10,000-trial Monte Carlo
+              simulation, so every result is grounded in reality, not a guess.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-2">
@@ -108,6 +108,10 @@ export default function Home() {
                 <Link href="#how-it-works">See How It Works</Link>
               </Button>
             </div>
+
+            <p className="text-sm font-medium text-foreground">
+              3 free analyses — no credit card required.
+            </p>
 
             <p className="max-w-md text-xs text-muted-foreground">
               Educational tool only — not financial, investment, legal, or tax advice.{" "}
@@ -181,7 +185,7 @@ export default function Home() {
             <div className="flex flex-col items-center gap-2 text-center">
               <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">How it works</h2>
               <p className="max-w-lg text-muted-foreground">
-                From address to answer in one search — no spreadsheets, no manual data entry.
+                From a real address — or your own numbers — to answer, in one pass.
               </p>
             </div>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
