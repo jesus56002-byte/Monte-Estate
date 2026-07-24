@@ -13,6 +13,7 @@ const envSchema = z.object({
   STRIPE_PRICE_STARTER: z.string().min(1).optional(),
   STRIPE_PRICE_INVESTOR: z.string().min(1).optional(),
   STRIPE_PRICE_TOPUP: z.string().min(1).optional(),
+  STRIPE_PRICE_PAYG: z.string().min(1).optional(),
   ADMIN_EMAILS: z.string().min(1).optional(),
   // Deliberately a raw string, not z.coerce.boolean() — Boolean("false") is
   // true in JS, which would make "PUBLIC_ACCESS_ENABLED=false" turn access
@@ -42,6 +43,7 @@ const parsed = envSchema.safeParse({
   STRIPE_PRICE_STARTER: emptyToUndefined(process.env.STRIPE_PRICE_STARTER),
   STRIPE_PRICE_INVESTOR: emptyToUndefined(process.env.STRIPE_PRICE_INVESTOR),
   STRIPE_PRICE_TOPUP: emptyToUndefined(process.env.STRIPE_PRICE_TOPUP),
+  STRIPE_PRICE_PAYG: emptyToUndefined(process.env.STRIPE_PRICE_PAYG),
   ADMIN_EMAILS: emptyToUndefined(process.env.ADMIN_EMAILS),
   PUBLIC_ACCESS_ENABLED: emptyToUndefined(process.env.PUBLIC_ACCESS_ENABLED),
   NEXT_PUBLIC_APP_URL: emptyToUndefined(process.env.NEXT_PUBLIC_APP_URL),
@@ -59,7 +61,11 @@ export const hasSupabaseConfig = Boolean(
   env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 );
 export const hasStripeConfig = Boolean(
-  env.STRIPE_SECRET_KEY && env.STRIPE_PRICE_STARTER && env.STRIPE_PRICE_INVESTOR && env.STRIPE_PRICE_TOPUP
+  env.STRIPE_SECRET_KEY &&
+    env.STRIPE_PRICE_STARTER &&
+    env.STRIPE_PRICE_INVESTOR &&
+    env.STRIPE_PRICE_TOPUP &&
+    env.STRIPE_PRICE_PAYG
 );
 /** Defaults to open; set PUBLIC_ACCESS_ENABLED=false to lock signups/checkout to admins only. */
 export const publicAccessEnabled = env.PUBLIC_ACCESS_ENABLED !== "false";

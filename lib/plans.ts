@@ -24,7 +24,10 @@ export const PLAN_MONTHLY_PRICE_USD: Record<PlanId, number> = {
 };
 
 export const TOPUP_ANALYSES = 10;
+/** In-plan top-up — only available to existing Starter/Investor subscribers. */
 export const TOPUP_PRICE_USD = 4.99;
+/** Pay As You Go — the standalone option for anyone without a subscription. Same 10 analyses, no plan required. */
+export const PAYG_PRICE_USD = 9.99;
 export const TOPUP_EXPIRATION_MONTHS = 12;
 
 export function analysesRemaining(

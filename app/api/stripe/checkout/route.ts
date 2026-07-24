@@ -7,11 +7,15 @@ import { getStripeClient } from "@/lib/stripe/client";
 import { TOPUP_ANALYSES } from "@/lib/plans";
 
 const SUBSCRIPTION_ITEMS = { starter: env.STRIPE_PRICE_STARTER, investor: env.STRIPE_PRICE_INVESTOR } as const;
+// Both are the same 10-analysis credit pack at different prices depending on
+// whether the buyer already pays for a plan — see the item-specific checks
+// below for which one a given request is allowed to use.
+const ONE_TIME_ITEMS = { topup: env.STRIPE_PRICE_TOPUP, payg: env.STRIPE_PRICE_PAYG } as const;
 
-type CheckoutItem = "starter" | "investor" | "topup";
+type CheckoutItem = "starter" | "investor" | "topup" | "payg";
 
 function isCheckoutItem(value: unknown): value is CheckoutItem {
-  return value === "starter" || value === "investor" || value === "topup";
+  return value === "starter" || value === "investor" || value === "topup" || value === "payg";
 }
 
 export async function POST(request: Request) {
@@ -40,7 +44,7 @@ export async function POST(request: Request) {
   const item = body?.item;
   if (!isCheckoutItem(item)) {
     return NextResponse.json(
-      { error: "INVALID_ITEM", message: "item must be one of: starter, investor, topup." },
+      { error: "INVALID_ITEM", message: "item must be one of: starter, investor, topup, payg." },
       { status: 400 }
     );
   }
@@ -54,9 +58,23 @@ export async function POST(request: Request) {
 
   const isCurrentlySubscribed = profile?.subscription_status === "active" || profile?.subscription_status === "trialing";
 
-  // Top-ups are available to any signed-in user, subscribed or not — a free
-  // user who wants a few more analyses without committing to a monthly plan
-  // shouldn't have to subscribe first just to buy loose credits.
+  // The 10-analysis credit pack comes in two prices depending on whether the
+  // buyer already pays for a plan: "topup" is the discounted in-plan add-on
+  // for existing Starter/Investor subscribers, "payg" is the standalone
+  // price for everyone else. Each is only valid for its matching audience.
+  if (item === "topup" && !isCurrentlySubscribed) {
+    return NextResponse.json(
+      { error: "TOPUP_REQUIRES_SUBSCRIPTION", message: "Only Starter and Investor subscribers can buy the in-plan top-up." },
+      { status: 403 }
+    );
+  }
+
+  if (item === "payg" && isCurrentlySubscribed) {
+    return NextResponse.json(
+      { error: "ALREADY_SUBSCRIBED", message: "You already have a subscription — buy the cheaper in-plan top-up instead." },
+      { status: 409 }
+    );
+  }
 
   if ((item === "starter" || item === "investor") && isCurrentlySubscribed) {
     return NextResponse.json(
@@ -85,13 +103,13 @@ export async function POST(request: Request) {
   }
 
   const session =
-    item === "topup"
+    item === "topup" || item === "payg"
       ? await stripe.checkout.sessions.create({
           mode: "payment",
           customer: customerId,
           client_reference_id: user.id,
-          line_items: [{ price: env.STRIPE_PRICE_TOPUP, quantity: 1 }],
-          metadata: { item: "topup", supabase_user_id: user.id, topup_analyses: String(TOPUP_ANALYSES) },
+          line_items: [{ price: ONE_TIME_ITEMS[item], quantity: 1 }],
+          metadata: { item, supabase_user_id: user.id, topup_analyses: String(TOPUP_ANALYSES) },
           success_url: `${env.NEXT_PUBLIC_APP_URL}/settings/success?session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${env.NEXT_PUBLIC_APP_URL}/settings`,
         })

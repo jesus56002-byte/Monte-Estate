@@ -13,6 +13,7 @@ const ALL_KEYS = [
   "STRIPE_PRICE_STARTER",
   "STRIPE_PRICE_INVESTOR",
   "STRIPE_PRICE_TOPUP",
+  "STRIPE_PRICE_PAYG",
   "ADMIN_EMAILS",
   "PUBLIC_ACCESS_ENABLED",
   "NEXT_PUBLIC_APP_URL",
@@ -64,7 +65,7 @@ describe("env", () => {
     expect(hasSupabaseConfig).toBe(true);
   });
 
-  it("requires all three Stripe prices before hasStripeConfig is true", async () => {
+  it("requires all four Stripe prices before hasStripeConfig is true", async () => {
     const { hasStripeConfig: withOnlyTwo } = await loadEnvWith({
       STRIPE_SECRET_KEY: "sk_test",
       STRIPE_PRICE_STARTER: "price_starter",
@@ -72,13 +73,22 @@ describe("env", () => {
     });
     expect(withOnlyTwo).toBe(false);
 
-    const { hasStripeConfig: withAllThree } = await loadEnvWith({
+    const { hasStripeConfig: withThree } = await loadEnvWith({
       STRIPE_SECRET_KEY: "sk_test",
       STRIPE_PRICE_STARTER: "price_starter",
       STRIPE_PRICE_INVESTOR: "price_investor",
       STRIPE_PRICE_TOPUP: "price_topup",
     });
-    expect(withAllThree).toBe(true);
+    expect(withThree).toBe(false);
+
+    const { hasStripeConfig: withAllFour } = await loadEnvWith({
+      STRIPE_SECRET_KEY: "sk_test",
+      STRIPE_PRICE_STARTER: "price_starter",
+      STRIPE_PRICE_INVESTOR: "price_investor",
+      STRIPE_PRICE_TOPUP: "price_topup",
+      STRIPE_PRICE_PAYG: "price_payg",
+    });
+    expect(withAllFour).toBe(true);
   });
 
   it("still throws for a genuinely malformed value", async () => {

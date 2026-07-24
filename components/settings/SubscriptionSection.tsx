@@ -5,6 +5,7 @@ import {
   PLAN_MONTHLY_PRICE_USD,
   TOPUP_ANALYSES,
   TOPUP_PRICE_USD,
+  PAYG_PRICE_USD,
   TOPUP_EXPIRATION_MONTHS,
   effectiveBonusAnalyses,
   type PlanId,
@@ -22,8 +23,6 @@ const FEATURES = [
   "10,000-trial Monte Carlo simulation with distribution chart",
   "AI-generated deal interpretation",
 ];
-
-const TIER_ORDER: PlanId[] = ["free", "starter", "investor"];
 
 export function SubscriptionSection({ data }: { data: SettingsData }) {
   const {
@@ -49,6 +48,46 @@ export function SubscriptionSection({ data }: { data: SettingsData }) {
           day: "numeric",
         })
       : null;
+
+  function renderPlanCard(planId: PlanId) {
+    const isCurrent = planId === currentPlan;
+    return (
+      <Card key={planId} className={cn("flex flex-col", isCurrent && "border-primary")}>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between text-lg">
+            {PLAN_LABELS[planId]}
+            {isCurrent && (
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                Current plan
+              </span>
+            )}
+          </CardTitle>
+          <CardDescription>
+            {planId === "free"
+              ? `${PLAN_ANALYSIS_LIMITS.free} free analyses with signup`
+              : `$${PLAN_MONTHLY_PRICE_USD[planId]}/month · ${PLAN_ANALYSIS_LIMITS[planId]} analyses/month`}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-1 flex-col justify-between gap-4">
+          <ul className="flex flex-col gap-1.5 text-sm text-muted-foreground">
+            {FEATURES.map((feature) => (
+              <li key={feature} className="flex items-start gap-2">
+                <Check className="mt-0.5 size-4 shrink-0 text-success" />
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+
+          {planId !== "free" && !isCurrent && !billingUnavailable && !isSubscribed && (
+            <SubscribeButton item={planId} size="sm" label={`Subscribe — $${PLAN_MONTHLY_PRICE_USD[planId]}/mo`} />
+          )}
+          {planId !== "free" && !isCurrent && !billingUnavailable && isSubscribed && (
+            <p className="text-xs text-muted-foreground">Use &quot;Manage billing&quot; below to switch plans.</p>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -110,59 +149,51 @@ export function SubscriptionSection({ data }: { data: SettingsData }) {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {TIER_ORDER.map((planId) => {
-          const isCurrent = planId === currentPlan;
-          return (
-            <Card key={planId} className={cn("flex flex-col", isCurrent && "border-primary")}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between text-lg">
-                  {PLAN_LABELS[planId]}
-                  {isCurrent && (
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                      Current plan
-                    </span>
-                  )}
-                </CardTitle>
-                <CardDescription>
-                  {planId === "free"
-                    ? `${PLAN_ANALYSIS_LIMITS.free} free analyses with signup`
-                    : `$${PLAN_MONTHLY_PRICE_USD[planId]}/month · ${PLAN_ANALYSIS_LIMITS[planId]} analyses/month`}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-1 flex-col justify-between gap-4">
-                <ul className="flex flex-col gap-1.5 text-sm text-muted-foreground">
-                  {FEATURES.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <Check className="mt-0.5 size-4 shrink-0 text-success" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {renderPlanCard("free")}
 
-                {planId !== "free" && !isCurrent && !billingUnavailable && !isSubscribed && (
-                  <SubscribeButton
-                    item={planId}
-                    size="sm"
-                    label={`Subscribe — $${PLAN_MONTHLY_PRICE_USD[planId]}/mo`}
-                  />
-                )}
-                {planId !== "free" && !isCurrent && !billingUnavailable && isSubscribed && (
-                  <p className="text-xs text-muted-foreground">Use &quot;Manage billing&quot; below to switch plans.</p>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
+        {/* Pay as you go sits between Free and Starter — a real option in its
+            own right, not an add-on pitch, so it gets the exact same card
+            shape (title, price line, feature list, single action) as every
+            subscription tier around it. */}
+        <Card className="flex flex-col">
+          <CardHeader>
+            <CardTitle className="text-lg">Pay as you go</CardTitle>
+            <CardDescription>${PAYG_PRICE_USD} one-time · {TOPUP_ANALYSES} analyses</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-1 flex-col justify-between gap-4">
+            <ul className="flex flex-col gap-1.5 text-sm text-muted-foreground">
+              {FEATURES.map((feature) => (
+                <li key={feature} className="flex items-start gap-2">
+                  <Check className="mt-0.5 size-4 shrink-0 text-success" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex flex-col gap-2">
+              {!billingUnavailable && !isSubscribed && (
+                <SubscribeButton item="payg" size="sm" label={`Get ${TOPUP_ANALYSES} analyses — $${PAYG_PRICE_USD}`} />
+              )}
+              {!billingUnavailable && isSubscribed && (
+                <p className="text-xs text-muted-foreground">Use the in-plan top-up below instead.</p>
+              )}
+              <p className="text-xs text-muted-foreground">Expires {TOPUP_EXPIRATION_MONTHS} months after purchase.</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {renderPlanCard("starter")}
+        {renderPlanCard("investor")}
       </div>
 
-      {!billingUnavailable && (
+      {isSubscribed && !billingUnavailable && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Need more analyses?</CardTitle>
+            <CardTitle className="text-base">Need more this month?</CardTitle>
             <CardDescription>
-              Buy {TOPUP_ANALYSES} additional analyses for ${TOPUP_PRICE_USD} — no subscription required. Stacks on
-              top of your plan, and unused credits expire {TOPUP_EXPIRATION_MONTHS} months after purchase.
+              Buy {TOPUP_ANALYSES} additional analyses for ${TOPUP_PRICE_USD} — the discounted in-plan rate. Stacks
+              on top of your plan, and unused credits expire {TOPUP_EXPIRATION_MONTHS} months after purchase.
             </CardDescription>
           </CardHeader>
           <CardContent>

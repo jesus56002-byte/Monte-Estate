@@ -9,7 +9,7 @@ export function SubscribeButton({
   size = "lg",
   variant = "default",
 }: {
-  item: "starter" | "investor" | "topup";
+  item: "starter" | "investor" | "topup" | "payg";
   label: string;
   size?: "sm" | "lg";
   variant?: "default" | "outline";
