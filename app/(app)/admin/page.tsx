@@ -3,7 +3,7 @@ import { env } from "@/lib/env";
 import { getAuthedUser } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isAdminEmail } from "@/lib/subscription";
-import { isPlanId } from "@/lib/plans";
+import { isPlanId, effectiveBonusAnalyses } from "@/lib/plans";
 import { AdminDashboard, type AdminUserRow } from "@/components/admin/AdminDashboard";
 
 function monthStartIso(): string {
@@ -32,7 +32,7 @@ export default async function AdminPage() {
     admin
       .from("profiles")
       .select(
-        "id, plan, subscription_status, plan_analyses_used, bonus_analyses_remaining, cancel_at_period_end, created_at"
+        "id, plan, subscription_status, plan_analyses_used, bonus_analyses_remaining, bonus_analyses_expires_at, cancel_at_period_end, created_at"
       )
       .order("created_at", { ascending: false })
       .limit(500),
@@ -56,7 +56,7 @@ export default async function AdminPage() {
     plan: isPlanId(row.plan) ? row.plan : "free",
     subscriptionStatus: row.subscription_status,
     analysesUsed: row.plan_analyses_used,
-    bonusAnalyses: row.bonus_analyses_remaining,
+    bonusAnalyses: effectiveBonusAnalyses(row.bonus_analyses_remaining, row.bonus_analyses_expires_at),
     cancelAtPeriodEnd: row.cancel_at_period_end,
     createdAt: row.created_at,
   }));

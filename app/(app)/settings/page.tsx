@@ -19,7 +19,7 @@ export default async function SettingsPage() {
     supabase
       .from("profiles")
       .select(
-        "display_name, phone, plan, plan_analyses_used, bonus_analyses_remaining, subscription_status, subscription_current_period_end, cancel_at_period_end, default_appreciation_pct, default_vacancy_pct, default_maintenance_pct, default_closing_cost_pct, default_insurance_pct, lifetime_analyses_count, created_at"
+        "display_name, phone, plan, plan_analyses_used, bonus_analyses_remaining, bonus_analyses_expires_at, subscription_status, subscription_current_period_end, cancel_at_period_end, default_appreciation_pct, default_vacancy_pct, default_maintenance_pct, default_closing_cost_pct, default_insurance_pct, lifetime_analyses_count, created_at"
       )
       .eq("id", user.id)
       .single(),
@@ -54,6 +54,7 @@ export default async function SettingsPage() {
         currentPlan={currentPlan}
         planAnalysesUsed={profile?.plan_analyses_used ?? 0}
         bonusAnalysesRemaining={profile?.bonus_analyses_remaining ?? 0}
+        bonusAnalysesExpiresAt={profile?.bonus_analyses_expires_at ?? null}
         isSubscribed={isSubscribed}
         periodEndLabel={periodEndLabel}
         cancelAtPeriodEnd={profile?.cancel_at_period_end ?? false}

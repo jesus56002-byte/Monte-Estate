@@ -5,6 +5,8 @@ import {
   PLAN_MONTHLY_PRICE_USD,
   TOPUP_ANALYSES,
   TOPUP_PRICE_USD,
+  TOPUP_EXPIRATION_MONTHS,
+  effectiveBonusAnalyses,
   type PlanId,
 } from "@/lib/plans";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -29,6 +31,7 @@ export function SubscriptionSection({ data }: { data: SettingsData }) {
     currentPlan,
     planAnalysesUsed,
     bonusAnalysesRemaining,
+    bonusAnalysesExpiresAt,
     isSubscribed,
     periodEndLabel,
     cancelAtPeriodEnd,
@@ -37,7 +40,15 @@ export function SubscriptionSection({ data }: { data: SettingsData }) {
 
   const limit = PLAN_ANALYSIS_LIMITS[currentPlan];
   const usagePct = limit > 0 ? Math.min(100, Math.round((planAnalysesUsed / limit) * 100)) : 0;
-  const canBuyTopUp = currentPlan !== "free" && isSubscribed;
+  const activeBonus = effectiveBonusAnalyses(bonusAnalysesRemaining, bonusAnalysesExpiresAt);
+  const bonusExpiresLabel =
+    activeBonus > 0 && bonusAnalysesExpiresAt
+      ? new Date(bonusAnalysesExpiresAt).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -58,7 +69,7 @@ export function SubscriptionSection({ data }: { data: SettingsData }) {
                 <span className="font-medium">Monthly analyses</span>
                 <span className="text-muted-foreground">
                   {Math.min(planAnalysesUsed, limit)} / {limit} used
-                  {bonusAnalysesRemaining > 0 ? ` (+${bonusAnalysesRemaining} bonus)` : ""}
+                  {activeBonus > 0 ? ` (+${activeBonus} bonus)` : ""}
                 </span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -67,6 +78,9 @@ export function SubscriptionSection({ data }: { data: SettingsData }) {
                   style={{ width: `${usagePct}%` }}
                 />
               </div>
+              {bonusExpiresLabel && (
+                <p className="text-xs text-muted-foreground">Bonus credits expire {bonusExpiresLabel}.</p>
+              )}
             </div>
           )}
 
@@ -111,8 +125,9 @@ export function SubscriptionSection({ data }: { data: SettingsData }) {
                   )}
                 </CardTitle>
                 <CardDescription>
-                  {planId === "free" ? "Free" : `$${PLAN_MONTHLY_PRICE_USD[planId]}/month`} ·{" "}
-                  {PLAN_ANALYSIS_LIMITS[planId]} analyses{planId === "free" ? " (lifetime)" : "/month"}
+                  {planId === "free"
+                    ? `${PLAN_ANALYSIS_LIMITS.free} free analyses with signup`
+                    : `$${PLAN_MONTHLY_PRICE_USD[planId]}/month · ${PLAN_ANALYSIS_LIMITS[planId]} analyses/month`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-1 flex-col justify-between gap-4">
@@ -141,13 +156,13 @@ export function SubscriptionSection({ data }: { data: SettingsData }) {
         })}
       </div>
 
-      {canBuyTopUp && !billingUnavailable && (
+      {!billingUnavailable && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Need more this month?</CardTitle>
+            <CardTitle className="text-base">Need more analyses?</CardTitle>
             <CardDescription>
-              Buy {TOPUP_ANALYSES} additional analyses for ${TOPUP_PRICE_USD} — stacks on top of your plan and rolls
-              over until used.
+              Buy {TOPUP_ANALYSES} additional analyses for ${TOPUP_PRICE_USD} — no subscription required. Stacks on
+              top of your plan, and unused credits expire {TOPUP_EXPIRATION_MONTHS} months after purchase.
             </CardDescription>
           </CardHeader>
           <CardContent>

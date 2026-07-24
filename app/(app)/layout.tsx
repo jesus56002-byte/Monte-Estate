@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { env, hasSupabaseConfig } from "@/lib/env";
 import { getAuthedUser } from "@/lib/supabase/server";
 import { isAdminEmail } from "@/lib/subscription";
-import { PLAN_ANALYSIS_LIMITS, PLAN_LABELS, isPlanId } from "@/lib/plans";
+import { PLAN_ANALYSIS_LIMITS, PLAN_LABELS, effectiveBonusAnalyses, isPlanId } from "@/lib/plans";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Logo } from "@/components/brand/Logo";
@@ -40,12 +40,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // status readout, not an access check.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("plan, plan_analyses_used, bonus_analyses_remaining")
+    .select("plan, plan_analyses_used, bonus_analyses_remaining, bonus_analyses_expires_at")
     .eq("id", user.id)
     .single();
   const plan = isPlanId(profile?.plan) ? profile.plan : "free";
   const used = profile?.plan_analyses_used ?? 0;
-  const bonus = profile?.bonus_analyses_remaining ?? 0;
+  const bonus = effectiveBonusAnalyses(profile?.bonus_analyses_remaining ?? 0, profile?.bonus_analyses_expires_at ?? null);
   const limit = PLAN_ANALYSIS_LIMITS[plan];
 
   return (

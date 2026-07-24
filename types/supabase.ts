@@ -28,6 +28,7 @@ export interface Database {
           plan: string;
           plan_analyses_used: number;
           bonus_analyses_remaining: number;
+          bonus_analyses_expires_at: string | null;
           terms_accepted_at: string | null;
           terms_version: string | null;
           phone: string | null;
@@ -55,6 +56,7 @@ export interface Database {
           plan?: string;
           plan_analyses_used?: number;
           bonus_analyses_remaining?: number;
+          bonus_analyses_expires_at?: string | null;
           terms_accepted_at?: string | null;
           terms_version?: string | null;
           phone?: string | null;
@@ -79,6 +81,7 @@ export interface Database {
           plan?: string;
           plan_analyses_used?: number;
           bonus_analyses_remaining?: number;
+          bonus_analyses_expires_at?: string | null;
           terms_accepted_at?: string | null;
           terms_version?: string | null;
           phone?: string | null;

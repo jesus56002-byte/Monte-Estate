@@ -54,12 +54,9 @@ export async function POST(request: Request) {
 
   const isCurrentlySubscribed = profile?.subscription_status === "active" || profile?.subscription_status === "trialing";
 
-  if (item === "topup" && (profile?.plan === "free" || !isCurrentlySubscribed)) {
-    return NextResponse.json(
-      { error: "TOPUP_REQUIRES_SUBSCRIPTION", message: "Only Starter and Investor subscribers can buy additional analyses." },
-      { status: 403 }
-    );
-  }
+  // Top-ups are available to any signed-in user, subscribed or not — a free
+  // user who wants a few more analyses without committing to a monthly plan
+  // shouldn't have to subscribe first just to buy loose credits.
 
   if ((item === "starter" || item === "investor") && isCurrentlySubscribed) {
     return NextResponse.json(

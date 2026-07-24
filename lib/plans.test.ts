@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { analysesRemaining, isPlanId } from "./plans";
+import { analysesRemaining, effectiveBonusAnalyses, isPlanId } from "./plans";
 
 describe("isPlanId", () => {
   it.each(["free", "starter", "investor"])("accepts %s", (value) => {
@@ -34,5 +34,26 @@ describe("analysesRemaining", () => {
 
   it("uses the investor plan's higher limit", () => {
     expect(analysesRemaining("investor", 0, 0)).toBe(60);
+  });
+});
+
+describe("effectiveBonusAnalyses", () => {
+  it("returns 0 when no bonus credits have ever been purchased", () => {
+    expect(effectiveBonusAnalyses(0, null)).toBe(0);
+  });
+
+  it("returns the stored count when the expiration is in the future", () => {
+    const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    expect(effectiveBonusAnalyses(7, future)).toBe(7);
+  });
+
+  it("returns 0 once the expiration has passed, even if the raw count is still positive", () => {
+    const past = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    expect(effectiveBonusAnalyses(7, past)).toBe(0);
+  });
+
+  it("never goes negative", () => {
+    const future = new Date(Date.now() + 1000).toISOString();
+    expect(effectiveBonusAnalyses(-3, future)).toBe(0);
   });
 });

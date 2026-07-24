@@ -9,6 +9,7 @@ export interface SettingsData {
   currentPlan: PlanId;
   planAnalysesUsed: number;
   bonusAnalysesRemaining: number;
+  bonusAnalysesExpiresAt: string | null;
   isSubscribed: boolean;
   periodEndLabel: string | null;
   cancelAtPeriodEnd: boolean;
