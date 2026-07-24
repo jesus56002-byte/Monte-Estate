@@ -2,7 +2,10 @@ import { z } from "zod";
 
 export const aiRecommendationSchema = z.object({
   verdict: z.enum(["strong_buy", "buy", "neutral", "caution", "avoid"]),
-  interpretation: z.string().max(300),
+  // The prompt asks Claude for ~280 characters, but LLMs can't count
+  // characters precisely — a tight cap here rejected a valid majority of
+  // real responses. This is headroom for that imprecision, not the target.
+  interpretation: z.string().max(400),
 });
 
 export type AIRecommendation = z.infer<typeof aiRecommendationSchema>;

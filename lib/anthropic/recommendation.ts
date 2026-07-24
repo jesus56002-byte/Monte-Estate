@@ -10,8 +10,8 @@ financing and operating assumptions, the resulting deterministic return metrics,
 a Monte Carlo simulation summary. Give a candid, specific verdict grounded in the actual numbers
 provided — reference real figures rather than generic advice. Don't just validate the deal; call out
 the single biggest risk if there is one. Respond with a verdict and one tight interpretation of at
-most 300 characters (a couple of sentences, no bullet points, no filler) that a reader can absorb in
-a few seconds.`;
+most 280 characters (a couple of sentences, no bullet points, no filler) that a reader can absorb in
+a few seconds. Staying comfortably under that limit matters more than using all of it.`;
 
 function buildUserPrompt(input: AIRecommendationRequest): string {
   const { property, investmentInputs: inputs, analysisResult: result, simulationSummary } = input;
@@ -48,10 +48,15 @@ function buildUserPrompt(input: AIRecommendationRequest): string {
   return lines.join("\n");
 }
 
-export async function generateRecommendation(input: AIRecommendationRequest): Promise<AIRecommendation> {
+async function requestRecommendation(input: AIRecommendationRequest): Promise<AIRecommendation> {
   const response = await anthropic.messages.parse({
     model: env.ANTHROPIC_MODEL,
-    max_tokens: 400,
+    // 400 was too tight: the model occasionally used part of the budget on
+    // adaptive thinking or ran slightly long, truncating the structured JSON
+    // mid-string and throwing instead of returning a usable response.
+    // Verified against live traffic: 400 failed ~50-60% of the time, 1024
+    // failed 0/15.
+    max_tokens: 1024,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content: buildUserPrompt(input) }],
     output_config: {
@@ -65,4 +70,18 @@ export async function generateRecommendation(input: AIRecommendationRequest): Pr
   }
 
   return response.parsed_output;
+}
+
+export async function generateRecommendation(input: AIRecommendationRequest): Promise<AIRecommendation> {
+  try {
+    return await requestRecommendation(input);
+  } catch (error) {
+    // Character-count instructions are inherently approximate for an LLM —
+    // even with headroom (see max_tokens/schema comments), an occasional
+    // response still runs long or gets cut off mid-JSON. One retry clears
+    // almost all of these without masking a real, persistent failure (a bad
+    // API key, a genuine rate limit) from the caller.
+    console.error("[generateRecommendation] first attempt failed, retrying once:", error);
+    return await requestRecommendation(input);
+  }
 }
