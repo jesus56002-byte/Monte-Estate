@@ -27,6 +27,19 @@ import type { AIRecommendation } from "@/lib/validation/ai";
 export type CreateAnalysisResult = { dealId: string } | { error: string; code?: string };
 
 /**
+ * createAnalysis calls RentCast's property-record lookup before the quota
+ * check (see the comment at that call site — a typo shouldn't cost a user
+ * one of their limited analyses), which means that one lookup isn't bounded
+ * by plan quota at all: a scripted loop hitting this action repeatedly would
+ * generate real, billed RentCast calls with nothing in the quota system to
+ * stop it. This cooldown is the actual guard against that — a real user
+ * never resubmits a search this fast, so it costs legitimate use nothing
+ * while capping a scripted loop to a fraction of its unthrottled rate.
+ */
+const PROPERTY_LOOKUP_COOLDOWN_MS = 3_000;
+const lastPropertyLookupAt = new Map<string, number>();
+
+/**
  * Shared quota gate for both entry points (address search and custom
  * scenario) — admins bypass it entirely, everyone else spends one credit
  * per analysis regardless of which path produced it. Returns null when the
@@ -190,6 +203,12 @@ export async function createAnalysis(address: string): Promise<CreateAnalysisRes
     return { error: parsedAddress.error.issues[0]?.message ?? "Invalid address." };
   }
   const resolvedAddress = parsedAddress.data.address;
+
+  const lastLookupAt = lastPropertyLookupAt.get(user.id);
+  if (lastLookupAt && Date.now() - lastLookupAt < PROPERTY_LOOKUP_COOLDOWN_MS) {
+    return { error: "Give it a moment before searching again.", code: "RATE_LIMITED" };
+  }
+  lastPropertyLookupAt.set(user.id, Date.now());
 
   let record;
   try {

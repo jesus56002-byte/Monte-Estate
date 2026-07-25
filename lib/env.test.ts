@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const ALL_KEYS = [
   "RENTCAST_API_KEY",
-  "RENTCAST_MAX_REQUESTS",
   "ANTHROPIC_API_KEY",
   "ANTHROPIC_MODEL",
   "NEXT_PUBLIC_SUPABASE_URL",
