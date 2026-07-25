@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
+import { InstagramIcon, FacebookGlyphIcon, TikTokIcon } from "@/components/marketing/SocialIcons";
 
 const CONTACT_EMAIL = "jesus@saguarodigitalventures.com";
+
+const SOCIAL_LINKS = [
+  { name: "Instagram", href: "https://www.instagram.com/monte.estate/", icon: InstagramIcon },
+  { name: "Facebook", href: "https://www.facebook.com/monteestate7/", icon: FacebookGlyphIcon },
+  { name: "TikTok", href: "https://www.tiktok.com/@monte_estate", icon: TikTokIcon },
+];
 
 export function Footer() {
   return (
@@ -20,6 +27,20 @@ export function Footer() {
               Contact
             </a>
           </nav>
+          <div className="flex items-center gap-4">
+            {SOCIAL_LINKS.map(({ name, href, icon: Icon }) => (
+              <a
+                key={name}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={name}
+                className="text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Icon className="size-5" />
+              </a>
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-col gap-1.5 border-t pt-6 text-xs leading-relaxed text-muted-foreground">
