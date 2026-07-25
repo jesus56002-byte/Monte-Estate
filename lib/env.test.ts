@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 const ALL_KEYS = [
   "RENTCAST_API_KEY",
+  "GOOGLE_PLACES_API_KEY",
   "ANTHROPIC_API_KEY",
   "ANTHROPIC_MODEL",
   "NEXT_PUBLIC_SUPABASE_URL",
@@ -36,8 +37,9 @@ afterEach(() => {
 
 describe("env", () => {
   it("boots with every optional key genuinely unset", async () => {
-    const { hasRentCastKey, hasAnthropicKey, hasSupabaseConfig } = await loadEnvWith({});
+    const { hasRentCastKey, hasGooglePlacesKey, hasAnthropicKey, hasSupabaseConfig } = await loadEnvWith({});
     expect(hasRentCastKey).toBe(false);
+    expect(hasGooglePlacesKey).toBe(false);
     expect(hasAnthropicKey).toBe(false);
     expect(hasSupabaseConfig).toBe(false);
   });
@@ -53,13 +55,15 @@ describe("env", () => {
   });
 
   it("reports keys as configured once real values are set", async () => {
-    const { hasRentCastKey, hasAnthropicKey, hasSupabaseConfig } = await loadEnvWith({
+    const { hasRentCastKey, hasGooglePlacesKey, hasAnthropicKey, hasSupabaseConfig } = await loadEnvWith({
       RENTCAST_API_KEY: "rc_test_key",
+      GOOGLE_PLACES_API_KEY: "gp_test_key",
       ANTHROPIC_API_KEY: "sk-ant-test",
       NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon-test-key",
     });
     expect(hasRentCastKey).toBe(true);
+    expect(hasGooglePlacesKey).toBe(true);
     expect(hasAnthropicKey).toBe(true);
     expect(hasSupabaseConfig).toBe(true);
   });

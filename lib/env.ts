@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   RENTCAST_API_KEY: z.string().min(1).optional(),
+  GOOGLE_PLACES_API_KEY: z.string().min(1).optional(),
   ANTHROPIC_API_KEY: z.string().min(1).optional(),
   ANTHROPIC_MODEL: z.string().min(1).default("claude-sonnet-5"),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
@@ -31,6 +32,7 @@ function emptyToUndefined(value: string | undefined): string | undefined {
 
 const parsed = envSchema.safeParse({
   RENTCAST_API_KEY: emptyToUndefined(process.env.RENTCAST_API_KEY),
+  GOOGLE_PLACES_API_KEY: emptyToUndefined(process.env.GOOGLE_PLACES_API_KEY),
   ANTHROPIC_API_KEY: emptyToUndefined(process.env.ANTHROPIC_API_KEY),
   ANTHROPIC_MODEL: emptyToUndefined(process.env.ANTHROPIC_MODEL),
   NEXT_PUBLIC_SUPABASE_URL: emptyToUndefined(process.env.NEXT_PUBLIC_SUPABASE_URL),
@@ -54,6 +56,7 @@ if (!parsed.success) {
 export const env = parsed.data;
 
 export const hasRentCastKey = Boolean(env.RENTCAST_API_KEY);
+export const hasGooglePlacesKey = Boolean(env.GOOGLE_PLACES_API_KEY);
 export const hasAnthropicKey = Boolean(env.ANTHROPIC_API_KEY);
 export const hasSupabaseConfig = Boolean(
   env.NEXT_PUBLIC_SUPABASE_URL && env.NEXT_PUBLIC_SUPABASE_ANON_KEY

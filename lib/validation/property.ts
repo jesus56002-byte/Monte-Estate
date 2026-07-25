@@ -8,3 +8,10 @@ export const addressSearchSchema = z.object({
 });
 
 export type AddressSearchInput = z.infer<typeof addressSearchSchema>;
+
+export const addressAutocompleteRequestSchema = z.object({
+  input: z.string().trim().min(3).max(200),
+  sessionToken: z.string().uuid(),
+});
+
+export type AddressAutocompleteRequest = z.infer<typeof addressAutocompleteRequestSchema>;
