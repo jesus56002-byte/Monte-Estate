@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       // Authenticated app pages have nothing to offer a search index, and
       // indexing /admin specifically would be a bad look regardless of the
       // auth gate in front of it.
-      disallow: ["/admin", "/deals", "/search", "/settings", "/api", "/auth"],
+      disallow: ["/admin", "/deals", "/home", "/search", "/settings", "/api", "/auth"],
     },
     sitemap: "https://monte.estate/sitemap.xml",
   };

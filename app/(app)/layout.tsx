@@ -52,7 +52,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="flex flex-1 flex-col">
       <header className="flex items-center justify-between border-b bg-card/60 px-6 py-4 backdrop-blur">
         <nav className="flex items-center gap-6">
-          <Link href="/search">
+          <Link href="/home">
             <Logo />
           </Link>
           <Link href="/search" className="text-sm text-muted-foreground hover:text-foreground">
