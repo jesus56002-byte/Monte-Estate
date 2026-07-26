@@ -187,6 +187,12 @@ export function HomeContent() {
                 </div>
               ))}
             </div>
+            <Link
+              href="/how-it-works"
+              className="mx-auto text-sm font-medium text-primary underline underline-offset-4"
+            >
+              Read the full Monte Carlo methodology →
+            </Link>
           </div>
         </section>
 

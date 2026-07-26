@@ -17,6 +17,12 @@ export function Footer() {
         <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
           <Logo />
           <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <Link href="/pricing" className="hover:text-foreground">
+              Pricing
+            </Link>
+            <Link href="/how-it-works" className="hover:text-foreground">
+              How It Works
+            </Link>
             <Link href="/terms" className="hover:text-foreground">
               Terms of Service
             </Link>

@@ -1,10 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { Logo } from "@/components/brand/Logo";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { HomeContent } from "@/components/marketing/HomeContent";
-import { publicAccessEnabled, hasSupabaseConfig } from "@/lib/env";
+import { hasSupabaseConfig } from "@/lib/env";
 import { getAuthedUser } from "@/lib/supabase/server";
 import { PLAN_LABELS, PLAN_MONTHLY_PRICE_USD, PAYG_PRICE_USD, type PlanId } from "@/lib/plans";
 
@@ -57,20 +54,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }}
       />
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-card/70 px-6 py-4 backdrop-blur">
-        <Logo />
-        <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/login">Log in</Link>
-          </Button>
-          {publicAccessEnabled && (
-            <Button asChild variant="outline" size="sm">
-              <Link href="/signup">Sign up</Link>
-            </Button>
-          )}
-          <ThemeToggle />
-        </div>
-      </header>
+      <MarketingHeader />
 
       <main className="flex flex-1 flex-col">
         <HomeContent />
