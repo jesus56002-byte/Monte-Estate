@@ -35,10 +35,14 @@ function ResultTile({
 export function ResultsSummary({
   result,
   holdingPeriodYears,
+  loanTermYears,
 }: {
   result: AnalysisResult;
   holdingPeriodYears: number;
+  loanTermYears: number;
 }) {
+  const numPayments = loanTermYears * 12;
+
   return (
     <div className="grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-3">
       <ResultTile
@@ -58,6 +62,8 @@ export function ResultsSummary({
         tone={result.totalProfit >= 0 ? "positive" : "negative"}
       />
       <ResultTile label="Monthly mortgage (P&I)" value={formatCurrency(result.monthlyMortgagePayment)} />
+      <ResultTile label="Total interest paid" value={formatCurrency(result.totalInterestPaid)} />
+      <ResultTile label={`Total of ${numPayments} payments`} value={formatCurrency(result.totalOfPayments)} />
     </div>
   );
 }

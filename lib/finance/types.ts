@@ -22,6 +22,10 @@ export interface AnalysisResult {
   loanAmount: number;
   downPayment: number;
   monthlyMortgagePayment: number;
+  /** Sum of every scheduled P&I payment over the full loan term (e.g. 360 payments on a 30-year loan) — not capped to the holding period. */
+  totalOfPayments: number;
+  /** totalOfPayments minus the original loan amount. */
+  totalInterestPaid: number;
   totalCashInvested: number;
 
   noiYear1: number;

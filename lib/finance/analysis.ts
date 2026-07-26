@@ -14,6 +14,12 @@ export function runAnalysis(inputs: InvestmentInputs): AnalysisResult {
   const annualDebtService = monthlyMortgagePayment * 12;
   const totalCashInvestedAmount = totalCashInvested(downPayment, inputs.closingCosts);
 
+  // Full-term figures (like a standalone mortgage calculator would show) —
+  // deliberately independent of holdingPeriodYears, which only bounds the
+  // investment-analysis cash flows below.
+  const totalOfPayments = monthlyMortgagePayment * inputs.loanTermYears * 12;
+  const totalInterestPaid = totalOfPayments - loanAmount;
+
   const annualCashFlows: number[] = [];
   let noiYear1 = 0;
 
@@ -63,6 +69,8 @@ export function runAnalysis(inputs: InvestmentInputs): AnalysisResult {
     loanAmount,
     downPayment,
     monthlyMortgagePayment,
+    totalOfPayments,
+    totalInterestPaid,
     totalCashInvested: totalCashInvestedAmount,
 
     noiYear1,

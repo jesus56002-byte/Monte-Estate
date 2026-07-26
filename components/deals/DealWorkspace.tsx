@@ -96,7 +96,11 @@ export function DealWorkspace({ deal }: { deal: Deal }) {
           </div>
         </div>
         <div className="flex flex-col items-center gap-6 lg:sticky lg:top-8 lg:self-start">
-          <ResultsSummary result={result} holdingPeriodYears={formValues.holdingPeriodYears} />
+          <ResultsSummary
+            result={result}
+            holdingPeriodYears={formValues.holdingPeriodYears}
+            loanTermYears={formValues.loanTermYears}
+          />
           <MonteCarloPanel
             baseInputs={investmentInputs}
             autoRun

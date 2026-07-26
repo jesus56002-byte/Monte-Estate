@@ -37,6 +37,22 @@ describe("runAnalysis", () => {
     expect(result.annualCashFlows).toHaveLength(5);
   });
 
+  it("computes full-term mortgage totals independent of the holding period", () => {
+    const result = runAnalysis(baseInputs({ holdingPeriodYears: 5 }));
+
+    // 30-year loan == 360 monthly payments, regardless of a 5-year hold.
+    expect(result.totalOfPayments).toBeCloseTo(result.monthlyMortgagePayment * 360, 6);
+    expect(result.totalInterestPaid).toBeCloseTo(result.totalOfPayments - result.loanAmount, 6);
+    expect(result.totalInterestPaid).toBeGreaterThan(0);
+  });
+
+  it("has no mortgage totals for an all-cash purchase", () => {
+    const result = runAnalysis(baseInputs({ downPaymentPct: 1 }));
+    expect(result.monthlyMortgagePayment).toBe(0);
+    expect(result.totalOfPayments).toBe(0);
+    expect(result.totalInterestPaid).toBe(0);
+  });
+
   it("produces a lower cap rate at a higher purchase price for the same NOI-driving inputs", () => {
     const cheap = runAnalysis(baseInputs({ purchasePrice: 200_000 }));
     const expensive = runAnalysis(baseInputs({ purchasePrice: 400_000 }));
