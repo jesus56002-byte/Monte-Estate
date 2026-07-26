@@ -16,15 +16,15 @@ function ResultTile({
   tone?: "positive" | "negative";
 }) {
   return (
-    <Card>
-      <CardHeader className="pb-0">
+    <Card className="items-center text-center">
+      <CardHeader className="w-full items-center justify-items-center pb-0">
         <CardTitle className="text-xs font-normal text-muted-foreground">{label}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="w-full">
         <p
           title={title}
           className={cn(
-            "text-2xl font-semibold tabular-nums",
+            "text-xl font-semibold tabular-nums sm:text-2xl",
             tone === "positive" && "text-success",
             tone === "negative" && "text-destructive"
           )}
@@ -48,7 +48,7 @@ export function ResultsSummary({
   const numPayments = loanTermYears * 12;
 
   return (
-    <div className="grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-3">
       <ResultTile
         label="Monthly cash flow"
         value={formatCurrency(result.monthlyCashFlowYear1)}
@@ -76,6 +76,11 @@ export function ResultsSummary({
         label={`Total of ${numPayments} payments`}
         value={formatCurrencyCompact(result.totalOfPayments)}
         title={formatCurrency(result.totalOfPayments)}
+      />
+      <ResultTile
+        label={`Total tax paid after ${holdingPeriodYears} yr${holdingPeriodYears === 1 ? "" : "s"}`}
+        value={formatCurrencyCompact(result.totalPropertyTaxPaid)}
+        title={formatCurrency(result.totalPropertyTaxPaid)}
       />
     </div>
   );

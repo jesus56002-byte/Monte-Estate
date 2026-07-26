@@ -78,7 +78,7 @@ export function DealWorkspace({ deal }: { deal: Deal }) {
         <DeleteDealButton dealId={deal.id} />
       </div>
 
-      <PropertySummaryCard property={deal.propertySnapshot} />
+      <PropertySummaryCard property={deal.propertySnapshot} totalMonthlyPayment={result.totalMonthlyPayment} />
 
       <div className="grid w-full max-w-5xl grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="flex flex-col items-center gap-3">

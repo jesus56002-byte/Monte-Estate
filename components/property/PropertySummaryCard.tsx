@@ -4,7 +4,14 @@ import { formatCurrency, formatNumber } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 import type { PropertyData } from "@/types/property";
 
-export function PropertySummaryCard({ property }: { property: PropertyData }) {
+export function PropertySummaryCard({
+  property,
+  totalMonthlyPayment,
+}: {
+  property: PropertyData;
+  /** Year-1 PITI (principal, interest, tax, insurance, HOA) from the current financing inputs. */
+  totalMonthlyPayment?: number;
+}) {
   const isCustom = property.source === "custom";
 
   const facts = [
@@ -39,11 +46,23 @@ export function PropertySummaryCard({ property }: { property: PropertyData }) {
             ))}
           </dl>
         )}
-        <div className={cn("grid grid-cols-2 gap-4", !isCustom && "border-t pt-4")}>
+        <div
+          className={cn(
+            "grid grid-cols-2 gap-4",
+            totalMonthlyPayment !== undefined && "sm:grid-cols-3",
+            !isCustom && "border-t pt-4"
+          )}
+        >
           <div className="flex flex-col gap-1">
             <dt className="text-xs text-muted-foreground">{isCustom ? "Purchase price" : "Estimated value"}</dt>
             <dd className="text-xl font-semibold">{formatCurrency(property.estimatedValue)}</dd>
           </div>
+          {totalMonthlyPayment !== undefined && (
+            <div className="flex flex-col gap-1">
+              <dt className="text-xs text-muted-foreground">Total monthly payment</dt>
+              <dd className="text-xl font-semibold">{formatCurrency(totalMonthlyPayment)}</dd>
+            </div>
+          )}
           <div className="flex flex-col gap-1">
             <dt className="text-xs text-muted-foreground">{isCustom ? "Monthly rent" : "Estimated rent / mo"}</dt>
             <dd className="text-xl font-semibold">{formatCurrency(property.estimatedRent)}</dd>

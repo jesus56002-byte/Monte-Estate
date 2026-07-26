@@ -19,9 +19,12 @@ export function runAnalysis(inputs: InvestmentInputs): AnalysisResult {
   // investment-analysis cash flows below.
   const totalOfPayments = monthlyMortgagePayment * inputs.loanTermYears * 12;
   const totalInterestPaid = totalOfPayments - loanAmount;
+  const totalMonthlyPayment =
+    monthlyMortgagePayment + inputs.propertyTaxAnnual / 12 + inputs.insuranceAnnual / 12 + inputs.hoaMonthly;
 
   const annualCashFlows: number[] = [];
   let noiYear1 = 0;
+  let totalPropertyTaxPaid = 0;
 
   for (let year = 1; year <= inputs.holdingPeriodYears; year++) {
     const grossScheduledRent = inputs.monthlyRent * 12 * Math.pow(1 + inputs.rentGrowthPct, year - 1);
@@ -37,6 +40,7 @@ export function runAnalysis(inputs: InvestmentInputs): AnalysisResult {
     const operatingExpenses = propertyTax + insurance + hoa + maintenance + propertyManagement;
     const noiThisYear = noi(egi, operatingExpenses);
     if (year === 1) noiYear1 = noiThisYear;
+    totalPropertyTaxPaid += propertyTax;
 
     annualCashFlows.push(noiThisYear - annualDebtService);
   }
@@ -69,6 +73,7 @@ export function runAnalysis(inputs: InvestmentInputs): AnalysisResult {
     loanAmount,
     downPayment,
     monthlyMortgagePayment,
+    totalMonthlyPayment,
     totalOfPayments,
     totalInterestPaid,
     totalCashInvested: totalCashInvestedAmount,
@@ -80,6 +85,7 @@ export function runAnalysis(inputs: InvestmentInputs): AnalysisResult {
     cashOnCash: cashOnCash(annualCashFlows[0], totalCashInvestedAmount),
 
     annualCashFlows,
+    totalPropertyTaxPaid,
 
     remainingLoanBalanceAtExit,
     grossSalePrice,

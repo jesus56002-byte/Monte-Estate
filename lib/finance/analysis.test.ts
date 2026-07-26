@@ -51,6 +51,26 @@ describe("runAnalysis", () => {
     expect(result.monthlyMortgagePayment).toBe(0);
     expect(result.totalOfPayments).toBe(0);
     expect(result.totalInterestPaid).toBe(0);
+    expect(result.totalMonthlyPayment).toBeCloseTo(
+      baseInputs().propertyTaxAnnual / 12 + baseInputs().insuranceAnnual / 12,
+      6
+    );
+  });
+
+  it("adds property tax and insurance on top of P&I for the total monthly payment", () => {
+    const result = runAnalysis(baseInputs({ hoaMonthly: 100 }));
+    expect(result.totalMonthlyPayment).toBeCloseTo(
+      result.monthlyMortgagePayment + 2_400 / 12 + 1_200 / 12 + 100,
+      6
+    );
+  });
+
+  it("grows total property tax paid with the holding period", () => {
+    const shortHold = runAnalysis(baseInputs({ holdingPeriodYears: 5 }));
+    const longHold = runAnalysis(baseInputs({ holdingPeriodYears: 10 }));
+    expect(longHold.totalPropertyTaxPaid).toBeGreaterThan(shortHold.totalPropertyTaxPaid);
+    // Year 1 alone (no growth yet) is the floor for a single year.
+    expect(shortHold.totalPropertyTaxPaid).toBeGreaterThan(2_400);
   });
 
   it("produces a lower cap rate at a higher purchase price for the same NOI-driving inputs", () => {
