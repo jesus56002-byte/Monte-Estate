@@ -1,15 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency, formatPercent } from "@/lib/utils/format";
+import { formatCurrency, formatCurrencyCompact, formatPercent } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 import type { AnalysisResult } from "@/lib/finance/types";
 
 function ResultTile({
   label,
   value,
+  title,
   tone,
 }: {
   label: string;
   value: string;
+  /** Full-precision value shown on hover — used when `value` is compact-formatted. */
+  title?: string;
   tone?: "positive" | "negative";
 }) {
   return (
@@ -19,6 +22,7 @@ function ResultTile({
       </CardHeader>
       <CardContent>
         <p
+          title={title}
           className={cn(
             "text-2xl font-semibold tabular-nums",
             tone === "positive" && "text-success",
@@ -44,7 +48,7 @@ export function ResultsSummary({
   const numPayments = loanTermYears * 12;
 
   return (
-    <div className="grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-3">
+    <div className="grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
       <ResultTile
         label="Monthly cash flow"
         value={formatCurrency(result.monthlyCashFlowYear1)}
@@ -58,12 +62,21 @@ export function ResultsSummary({
       />
       <ResultTile
         label={`Total profit after ${holdingPeriodYears} yr${holdingPeriodYears === 1 ? "" : "s"}`}
-        value={formatCurrency(result.totalProfit)}
+        value={formatCurrencyCompact(result.totalProfit)}
+        title={formatCurrency(result.totalProfit)}
         tone={result.totalProfit >= 0 ? "positive" : "negative"}
       />
       <ResultTile label="Monthly mortgage (P&I)" value={formatCurrency(result.monthlyMortgagePayment)} />
-      <ResultTile label="Total interest paid" value={formatCurrency(result.totalInterestPaid)} />
-      <ResultTile label={`Total of ${numPayments} payments`} value={formatCurrency(result.totalOfPayments)} />
+      <ResultTile
+        label="Total interest paid"
+        value={formatCurrencyCompact(result.totalInterestPaid)}
+        title={formatCurrency(result.totalInterestPaid)}
+      />
+      <ResultTile
+        label={`Total of ${numPayments} payments`}
+        value={formatCurrencyCompact(result.totalOfPayments)}
+        title={formatCurrency(result.totalOfPayments)}
+      />
     </div>
   );
 }

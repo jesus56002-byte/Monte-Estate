@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { formatCurrency, formatPercent } from "@/lib/utils/format";
+import { formatCurrency, formatCurrencyCompact, formatPercent } from "@/lib/utils/format";
 import type { PercentileSummary as PercentileSummaryData } from "@/lib/montecarlo/stats";
 
 function CaseCard({
@@ -22,13 +22,13 @@ function CaseCard({
       <CardContent className="flex min-w-0 flex-col gap-1">
         <p
           className={cn(
-            "truncate text-lg font-semibold tabular-nums sm:text-xl",
+            "text-lg font-semibold tabular-nums sm:text-xl",
             tone === "positive" && "text-success",
             tone === "negative" && "text-destructive"
           )}
           title={formatCurrency(profit)}
         >
-          {formatCurrency(profit)}
+          {formatCurrencyCompact(profit)}
         </p>
         <p className="text-xs text-muted-foreground">
           IRR {Number.isNaN(irr) ? "—" : formatPercent(irr)}
