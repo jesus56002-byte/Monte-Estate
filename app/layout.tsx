@@ -15,16 +15,32 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const TITLE = "Monte Estate — Real Estate Investment Analysis Tool";
+const DESCRIPTION =
+  "Analyze real estate investments in seconds — cash flow, cap rate, IRR, and a 10,000-trial Monte Carlo simulation with an AI-generated read on every deal.";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://monte.estate"),
   title: {
-    default: "Monte Estate — Real Estate Investment Analysis & Monte Carlo Simulation",
+    default: TITLE,
     template: "%s — Monte Estate",
   },
-  description:
-    "Analyze real estate investments in seconds. Enter an address for real property data or build a custom scenario, then get instant cash flow, cap rate, IRR, and a 10,000-trial Monte Carlo simulation with an AI-generated read on the deal.",
+  description: DESCRIPTION,
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: "https://monte.estate",
+    siteName: "Monte Estate",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
   },
   verification: {
     other: {
