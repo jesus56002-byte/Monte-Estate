@@ -33,7 +33,7 @@ export function AppNavHeader({ isAdmin, plan, used, limit, bonus }: AppHeaderDat
     : `${PLAN_LABELS[plan]} · ${Math.max(0, limit - used)}/${limit} left${bonus > 0 ? ` +${bonus} bonus` : ""}`;
 
   return (
-    <header className="relative border-b bg-card/60 backdrop-blur">
+    <header className="relative z-50 border-b bg-card/60 backdrop-blur">
       <div className="flex items-center justify-between px-4 py-4 sm:px-6">
         <div className="flex items-center gap-6">
           <Link href="/home">
