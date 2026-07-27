@@ -61,6 +61,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Link href="/deals" className="text-sm text-muted-foreground hover:text-foreground">
             Saved deals
           </Link>
+          <Link href="/calculators" className="text-sm text-muted-foreground hover:text-foreground">
+            Calculators
+          </Link>
           {isAdmin && (
             <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground">
               Admin
