@@ -1,13 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Calculator, TrendingUp, Percent, LineChart } from "lucide-react";
+import { Calculator, TrendingUp, Percent, LineChart, Home } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { Footer } from "@/components/marketing/Footer";
 
 const TITLE = "Real Estate Investment Calculators";
 const DESCRIPTION =
-  "Free real estate investment calculators: cap rate, cash flow, cash-on-cash return, and IRR. Instant results, no signup required.";
+  "Free real estate investment calculators: mortgage payment, cap rate, cash flow, cash-on-cash return, and IRR. Instant results, no signup required.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -18,6 +18,12 @@ export const metadata: Metadata = {
 };
 
 const CALCULATORS: { icon: LucideIcon; title: string; description: string; href: string }[] = [
+  {
+    icon: Home,
+    title: "Mortgage Payment Calculator",
+    description: "Your full monthly payment (PITI), total interest paid, and total of all payments over the loan term.",
+    href: "/mortgage-calculator",
+  },
   {
     icon: Percent,
     title: "Cap Rate Calculator",
@@ -54,7 +60,7 @@ export default function CalculatorsPage() {
           <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-4 text-center">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Investment Calculators</h1>
             <p className="max-w-xl text-lg text-muted-foreground">
-              Four free calculators for the core real estate return metrics. Instant results, no signup
+              Five free calculators for the core real estate return metrics. Instant results, no signup
               required.
             </p>
           </div>

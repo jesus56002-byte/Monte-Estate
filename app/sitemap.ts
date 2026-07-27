@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/pricing`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${BASE_URL}/how-it-works`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${BASE_URL}/calculators`, priority: 0.8, changeFrequency: "monthly" },
+    { url: `${BASE_URL}/mortgage-calculator`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/cap-rate-calculator`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/cash-flow-calculator`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/cash-on-cash-calculator`, priority: 0.7, changeFrequency: "monthly" },
