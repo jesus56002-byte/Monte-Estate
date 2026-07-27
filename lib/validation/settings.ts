@@ -4,11 +4,13 @@ const PHONE_REGEX = /^\+?[0-9()\-.\s]{7,20}$/;
 
 export const profileSchema = z.object({
   displayName: z.string().trim().min(1, "Name is required.").max(120, "Name is too long."),
+  // Optional — signup no longer requires a phone number, and this is where
+  // it can be added later. See lib/validation/auth.ts's signupSchema.
   phone: z
     .string()
-    .trim()
-    .min(7, "Enter a valid cell phone number.")
-    .regex(PHONE_REGEX, "Enter a valid cell phone number."),
+    .optional()
+    .transform((value) => value?.trim() || undefined)
+    .refine((value) => !value || PHONE_REGEX.test(value), { message: "Enter a valid cell phone number." }),
 });
 
 export type ProfileInput = z.infer<typeof profileSchema>;

@@ -12,11 +12,14 @@ export const signupSchema = z
     email: z.string().email("Enter a valid email address."),
     password: z.string().min(8, "Password must be at least 8 characters."),
     confirmPassword: z.string().min(1, "Please confirm your password."),
+    // Optional at signup — reduces friction for new accounts. Still
+    // available to add later in Settings (lib/validation/settings.ts's
+    // profileSchema), same optional treatment there.
     phone: z
       .string()
-      .trim()
-      .min(7, "Enter a valid cell phone number.")
-      .regex(PHONE_REGEX, "Enter a valid cell phone number."),
+      .optional()
+      .transform((value) => value?.trim() || undefined)
+      .refine((value) => !value || PHONE_REGEX.test(value), { message: "Enter a valid cell phone number." }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match.",

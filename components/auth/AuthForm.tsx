@@ -54,8 +54,10 @@ export function AuthForm({
 
       {!isLogin && (
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="phone">Cell phone number</Label>
-          <Input id="phone" name="phone" type="tel" autoComplete="tel" required />
+          <Label htmlFor="phone">
+            Cell phone number <span className="font-normal text-muted-foreground">(optional)</span>
+          </Label>
+          <Input id="phone" name="phone" type="tel" autoComplete="tel" />
         </div>
       )}
 

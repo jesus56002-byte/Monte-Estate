@@ -24,8 +24,11 @@ describe("signupSchema", () => {
     }
   });
 
-  it("rejects a missing phone number", () => {
-    expect(signupSchema.safeParse(baseInput({ phone: "" })).success).toBe(false);
+  it("accepts a missing phone number — it's optional at signup", () => {
+    expect(signupSchema.safeParse(baseInput({ phone: "" })).success).toBe(true);
+    const { phone, ...withoutPhone } = baseInput();
+    void phone;
+    expect(signupSchema.safeParse(withoutPhone).success).toBe(true);
   });
 
   it("rejects a phone number with letters", () => {
