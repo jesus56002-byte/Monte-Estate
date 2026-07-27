@@ -8,13 +8,23 @@ import { formatFullDate } from "@/lib/utils/format";
 const TITLE = "Blog";
 const DESCRIPTION = "Real estate investing education: cash flow, cap rate, risk analysis, and Monte Carlo simulation explained.";
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/blog" },
-  openGraph: { title: `${TITLE} — Monte Estate`, description: DESCRIPTION, url: "https://monte.estate/blog" },
-  twitter: { title: `${TITLE} — Monte Estate`, description: DESCRIPTION },
-};
+// While there are no posts yet, this page has nothing but placeholder text —
+// genuinely thin content, so Google is right to flag it (shows up in Search
+// Console as a "Soft 404"). Telling it not to index an empty listing is the
+// correct move, not a workaround; the moment a real post exists this
+// switches back to indexable on its own, no manual toggle needed.
+export function generateMetadata(): Metadata {
+  const hasPosts = getAllPosts().length > 0;
+
+  return {
+    title: TITLE,
+    description: DESCRIPTION,
+    alternates: { canonical: "/blog" },
+    openGraph: { title: `${TITLE} — Monte Estate`, description: DESCRIPTION, url: "https://monte.estate/blog" },
+    twitter: { title: `${TITLE} — Monte Estate`, description: DESCRIPTION },
+    robots: hasPosts ? undefined : { index: false, follow: true },
+  };
+}
 
 export default function BlogIndexPage() {
   const posts = getAllPosts();
