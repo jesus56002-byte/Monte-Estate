@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AlertCircle, Home, ShieldCheck, SlidersHorizontal, Sparkles } from "lucide-react";
+import { AlertCircle, Home, Loader2, ShieldCheck, SlidersHorizontal, Sparkles } from "lucide-react";
 import { AddressSearchForm } from "@/components/property/AddressSearchForm";
 import { PropertyIllustration } from "@/components/marketing/PropertyIllustration";
 import { Button } from "@/components/ui/button";
 import { createAnalysis } from "@/app/(app)/deals/actions";
+import { clearPendingAddress } from "@/app/search/actions";
 
 function OrDivider() {
   return (
@@ -21,11 +22,27 @@ function OrDivider() {
   );
 }
 
-export default function SearchPage() {
+/**
+ * The signed-in search experience: one step, address to saved deal. Also
+ * handles the handoff from the anonymous flow (AnonymousSearchView) — a
+ * visitor who previewed an address and hit the signup wall lands back here
+ * already authenticated, and `pendingAddress` (from the cookie stashed
+ * before signup, read server-side in app/search/page.tsx) auto-runs the
+ * analysis they were actually here for instead of making them search again.
+ */
+export function AuthedSearchView({ pendingAddress }: { pendingAddress?: string }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
+  // Separate from `isPending` on purpose: if the auto-run fails and the user
+  // retries manually, `pendingAddress` is still a truthy prop (it's fixed at
+  // mount), so gating the loading screen on `isPending` alone would show
+  // "Finishing your analysis for {stale address}" for an unrelated manual
+  // search. This flips to false the moment the auto-run attempt settles,
+  // whichever way, and never turns back on.
+  const [isAutoRunning, setIsAutoRunning] = useState(Boolean(pendingAddress));
+  const hasAutoRun = useRef(false);
 
   function handleSearch(address: string) {
     setErrorMessage(null);
@@ -36,10 +53,32 @@ export default function SearchPage() {
       if ("error" in result) {
         setErrorMessage(result.error);
         setErrorCode(result.code ?? null);
+        setIsAutoRunning(false);
         return;
       }
       router.push(`/deals/${result.dealId}`);
     });
+  }
+
+  useEffect(() => {
+    if (!pendingAddress || hasAutoRun.current) return;
+    hasAutoRun.current = true;
+    clearPendingAddress();
+    handleSearch(pendingAddress);
+    // handleSearch is stable enough for this one-time, mount-only auto-run.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingAddress]);
+
+  if (isAutoRunning) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-24 text-center">
+        <Loader2 className="size-6 animate-spin text-primary" />
+        <div className="flex flex-col gap-1">
+          <p className="font-medium">Finishing your analysis for {pendingAddress}…</p>
+          <p className="text-sm text-muted-foreground">This takes a few seconds.</p>
+        </div>
+      </div>
+    );
   }
 
   return (

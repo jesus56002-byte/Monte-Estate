@@ -1,8 +1,30 @@
 import { NextResponse } from "next/server";
-import { hasGooglePlacesKey } from "@/lib/env";
-import { requireApiUser } from "@/lib/api/requireApiUser";
+import { headers } from "next/headers";
+import { hasGooglePlacesKey, hasSupabaseConfig } from "@/lib/env";
+import { getAuthedUser } from "@/lib/supabase/server";
 import { addressAutocompleteRequestSchema } from "@/lib/validation/property";
 import { getAddressSuggestions, GooglePlacesApiError } from "@/lib/google-places/client";
+
+/** Falls back to IP for the anonymous "search first" flow — see resolveRateLimitKey below. */
+async function getClientIp(): Promise<string> {
+  const headerList = await headers();
+  const forwardedFor = headerList.get("x-forwarded-for");
+  if (forwardedFor) return forwardedFor.split(",")[0]!.trim();
+  return headerList.get("x-real-ip") ?? "unknown";
+}
+
+/**
+ * Reachable by anonymous visitors now too (the "search first, sign up
+ * second" flow — app/search/page.tsx), so the rate-limit key falls back to
+ * IP when there's no signed-in user rather than requiring auth outright.
+ */
+async function resolveRateLimitKey(): Promise<string> {
+  if (hasSupabaseConfig) {
+    const { user } = await getAuthedUser();
+    if (user) return user.id;
+  }
+  return getClientIp();
+}
 
 /**
  * Two independent in-memory guards, both best-effort (reset on cold start,
@@ -21,12 +43,12 @@ const SESSION_WINDOW_MS = 60_000;
 const lastRequestAt = new Map<string, number>();
 const sessionWindowByUser = new Map<string, { seen: Set<string>; windowStart: number }>();
 
-function isNewSessionAllowed(userId: string, sessionToken: string): boolean {
+function isNewSessionAllowed(rateLimitKey: string, sessionToken: string): boolean {
   const now = Date.now();
-  const entry = sessionWindowByUser.get(userId);
+  const entry = sessionWindowByUser.get(rateLimitKey);
 
   if (!entry || now - entry.windowStart > SESSION_WINDOW_MS) {
-    sessionWindowByUser.set(userId, { seen: new Set([sessionToken]), windowStart: now });
+    sessionWindowByUser.set(rateLimitKey, { seen: new Set([sessionToken]), windowStart: now });
     return true;
   }
   if (entry.seen.has(sessionToken)) return true;
@@ -46,9 +68,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const gate = await requireApiUser();
-  if (gate.response) return gate.response;
-  const { user } = gate;
+  const rateLimitKey = await resolveRateLimitKey();
 
   const body = await request.json().catch(() => null);
   const parsed = addressAutocompleteRequestSchema.safeParse(body);
@@ -60,13 +80,13 @@ export async function POST(request: Request) {
   }
   const { input, sessionToken } = parsed.data;
 
-  const lastAt = lastRequestAt.get(user.id);
+  const lastAt = lastRequestAt.get(rateLimitKey);
   if (lastAt && Date.now() - lastAt < MIN_REQUEST_INTERVAL_MS) {
     return NextResponse.json({ suggestions: [] });
   }
-  lastRequestAt.set(user.id, Date.now());
+  lastRequestAt.set(rateLimitKey, Date.now());
 
-  if (!isNewSessionAllowed(user.id, sessionToken)) {
+  if (!isNewSessionAllowed(rateLimitKey, sessionToken)) {
     return NextResponse.json(
       { error: "RATE_LIMITED", message: "Too many searches right now. Try again in a moment." },
       { status: 429 }

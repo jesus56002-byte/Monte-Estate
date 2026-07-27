@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: BASE_URL, priority: 1, changeFrequency: "weekly" },
+    { url: `${BASE_URL}/search`, priority: 0.9, changeFrequency: "weekly" },
     { url: `${BASE_URL}/pricing`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${BASE_URL}/how-it-works`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${BASE_URL}/calculators`, priority: 0.8, changeFrequency: "monthly" },

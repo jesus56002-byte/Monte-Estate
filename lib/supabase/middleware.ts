@@ -2,7 +2,11 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { env, hasSupabaseConfig } from "@/lib/env";
 
-const PROTECTED_PREFIXES = ["/home", "/search", "/deals", "/settings", "/admin"];
+// "/search" itself is deliberately NOT here — anonymous visitors can look up
+// an address and see a free preview; only "Generate Monte Carlo Analysis"
+// requires an account. "/search/custom" stays gated since there's no
+// property to preview in that flow (see app/search/page.tsx).
+const PROTECTED_PREFIXES = ["/home", "/search/custom", "/deals", "/settings", "/admin"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
