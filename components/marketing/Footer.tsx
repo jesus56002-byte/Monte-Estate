@@ -23,6 +23,9 @@ export function Footer() {
             <Link href="/how-it-works" className="hover:text-foreground">
               How It Works
             </Link>
+            <Link href="/calculators" className="hover:text-foreground">
+              Calculators
+            </Link>
             <Link href="/terms" className="hover:text-foreground">
               Terms of Service
             </Link>
