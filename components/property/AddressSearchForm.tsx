@@ -154,7 +154,7 @@ export function AddressSearchForm({
             placeholder="123 Main St, Austin, TX 78701"
             aria-invalid={Boolean(errors.address)}
             autoComplete="off"
-            className="h-14 rounded-full border-none bg-card pr-4 pl-11 text-base shadow-soft-lg"
+            className="h-14 rounded-full border-2 border-primary/30 bg-background pr-4 pl-11 text-base shadow-soft-lg focus-visible:border-primary"
             onChange={handleAddressChange}
             onKeyDown={handleKeyDown}
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
