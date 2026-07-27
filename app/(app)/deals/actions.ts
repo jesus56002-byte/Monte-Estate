@@ -69,6 +69,12 @@ async function consumeQuotaOrError(
       code: "QUOTA_EXCEEDED",
     };
   }
+
+  // The quota badge lives in the shared (app) layout, which the client
+  // router otherwise keeps serving from cache after router.push() to the
+  // new deal — without this the badge shows stale counts until something
+  // else forces the layout to re-render.
+  revalidatePath("/", "layout");
   return null;
 }
 
