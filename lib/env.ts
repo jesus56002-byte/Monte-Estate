@@ -20,6 +20,7 @@ const envSchema = z.object({
   // back ON. Compared explicitly below instead.
   PUBLIC_ACCESS_ENABLED: z.string().min(1).optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_META_PIXEL_ID: z.string().min(1).optional(),
 });
 
 // `.env.local` lines like `ANTHROPIC_API_KEY=` parse to "" (not undefined), and
@@ -47,6 +48,7 @@ const parsed = envSchema.safeParse({
   ADMIN_EMAILS: emptyToUndefined(process.env.ADMIN_EMAILS),
   PUBLIC_ACCESS_ENABLED: emptyToUndefined(process.env.PUBLIC_ACCESS_ENABLED),
   NEXT_PUBLIC_APP_URL: emptyToUndefined(process.env.NEXT_PUBLIC_APP_URL),
+  NEXT_PUBLIC_META_PIXEL_ID: emptyToUndefined(process.env.NEXT_PUBLIC_META_PIXEL_ID),
 });
 
 if (!parsed.success) {
@@ -70,3 +72,4 @@ export const hasStripeConfig = Boolean(
 );
 /** Defaults to open; set PUBLIC_ACCESS_ENABLED=false to lock signups/checkout to admins only. */
 export const publicAccessEnabled = env.PUBLIC_ACCESS_ENABLED !== "false";
+export const hasMetaPixel = Boolean(env.NEXT_PUBLIC_META_PIXEL_ID);

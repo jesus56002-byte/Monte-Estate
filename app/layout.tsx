@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { PageViewTracker } from "@/components/analytics/PageViewTracker";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,6 +66,7 @@ export default function RootLayout({
           {children}
         </ThemeProvider>
         <PageViewTracker />
+        <MetaPixel />
         <Analytics />
       </body>
     </html>
